@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Imposter Beat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07070f;
+  --s1: #0d0d1e;
+  --s2: #141428;
+  --s3: #1c1c38;
+  --border: #2a2a50;
+  --border2: #38385a;
+  --coral: #FF5F3F;
+  --coral-d: #cc4a2f;
+  --teal: #00C9A7;
+  --gold: #F4C542;
+  --purple: #a855f7;
+  --text: #EAE8F8;
+  --sub: #9090C0;
+  --dim: #5555820;
+  --font-d: 'Bebas Neue', sans-serif;
+  --font-b: 'Plus Jakarta Sans', sans-serif;
+  --r: 16px;
+  --r2: 24px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+body {
+  font-family: var(--font-b);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100%;
+  min-height: -webkit-fill-available;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-size: 150px;
+  opacity: 0.6;
+}
+#root { position: relative; z-index: 1; }
+
+/* Typography */
+.display { font-family: var(--font-d); letter-spacing: 0.03em; }
+.mono { font-family: 'Courier New', monospace; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--s1); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Animations */
+@keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes scaleIn { from { opacity:0; transform:scale(0.88); } to { opacity:1; transform:scale(1); } }
+@keyframes glow { 0%,100% { box-shadow: 0 0 20px var(--c,#FF5F3F)44; } 50% { box-shadow: 0 0 40px var(--c,#FF5F3F)88; } }
+@keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.04); } }
+@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes flipIn { from { transform:rotateY(90deg) scale(0.9); opacity:0; } to { transform:rotateY(0) scale(1); opacity:1; } }
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+@keyframes tickUp { from{transform:translateY(6px);opacity:0} to{transform:translateY(0);opacity:1} }
+@keyframes scanline { from{transform:translateX(-100%)} to{transform:translateX(300%)} }
+@keyframes spotlight { 0%,100%{opacity:0.15} 50%{opacity:0.28} }
+@keyframes riseBar { from{height:0%} to{height:var(--h)} }
+@keyframes burst { 0%{transform:scale(0);opacity:1} 100%{transform:scale(2.5);opacity:0} }
+@keyframes drum { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+
+.fade-up { animation: fadeUp 0.38s cubic-bezier(0.22,1,0.36,1) both; }
+.fade-up-2 { animation: fadeUp 0.38s 0.06s cubic-bezier(0.22,1,0.36,1) both; }
+.fade-up-3 { animation: fadeUp 0.38s 0.12s cubic-bezier(0.22,1,0.36,1) both; }
+.fade-up-4 { animation: fadeUp 0.38s 0.18s cubic-bezier(0.22,1,0.36,1) both; }
+.fade-up-5 { animation: fadeUp 0.38s 0.24s cubic-bezier(0.22,1,0.36,1) both; }
+.scale-in { animation: scaleIn 0.34s cubic-bezier(0.22,1,0.36,1) both; }
+
+/* Layout */
+.page { min-height:100dvh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px 20px; }
+.page-top { min-height:100dvh; display:flex; flex-direction:column; padding:24px 20px 32px; }
+.container { width:100%; max-width:380px; }
+
+/* Cards */
+.card {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 20px;
+}
+.card-glow {
+  background: var(--s2);
+  border: 1px solid;
+  border-radius: var(--r2);
+  padding: 20px;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* Buttons */
+.btn {
+  display:block; width:100%; padding:16px;
+  border:none; border-radius:var(--r); cursor:pointer;
+  font-family:var(--font-b); font-size:16px; font-weight:800;
+  letter-spacing:0.02em; transition:all 0.15s;
+  position:relative; overflow:hidden;
+}
+.btn::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(rgba(255,255,255,0.08),transparent);
+  border-radius:inherit;
+}
+.btn:active { transform:scale(0.97); }
+.btn-primary { background:var(--coral); color:#fff; box-shadow:0 4px 24px rgba(255,95,63,0.4); }
+.btn-primary:hover { background:var(--coral-d); box-shadow:0 4px 32px rgba(255,95,63,0.6); }
+.btn-teal { background:var(--teal); color:#07070f; box-shadow:0 4px 24px rgba(0,201,167,0.35); }
+.btn-gold { background:var(--gold); color:#07070f; box-shadow:0 4px 24px rgba(244,197,66,0.4); }
+.btn-purple { background:var(--purple); color:#fff; box-shadow:0 4px 24px rgba(168,85,247,0.4); }
+.btn-ghost { background:rgba(255,255,255,0.06); color:var(--sub); border:1px solid var(--border); }
+.btn-ghost:hover { background:rgba(255,255,255,0.1); color:var(--text); }
+.btn-danger { background:#dc2626; color:#fff; box-shadow:0 4px 24px rgba(220,38,38,0.4); }
+.btn-sm { padding:10px 18px; font-size:14px; width:auto; display:inline-flex; align-items:center; gap:6px; }
+.btn:disabled { background:#2a2a45 !important; color:#5050708 !important; box-shadow:none !important; cursor:not-allowed; transform:none !important; }
+
+/* Input */
+.input {
+  width:100%; padding:14px 16px;
+  background:rgba(255,255,255,0.05); border:1.5px solid var(--border);
+  border-radius:var(--r); color:var(--text);
+  font-family:var(--font-b); font-size:16px;
+  outline:none; transition:border-color 0.2s;
+}
+.input:focus { border-color:var(--coral); }
+.input::placeholder { color:var(--sub); }
+.input-code {
+  font-family:var(--font-d); font-size:40px; letter-spacing:12px;
+  text-align:center; padding:18px;
+}
+
+/* Tags */
+.tag {
+  display:inline-flex; align-items:center;
+  padding:4px 10px; border-radius:20px;
+  font-size:11px; font-weight:700; letter-spacing:0.04em;
+  text-transform:uppercase;
+}
+.tag-impact-high { background:#ef444433; color:#f87171; }
+.tag-impact-med  { background:#f59e0b33; color:#fbbf24; }
+.tag-effort-low  { color:#4ade80; }
+
+/* Player avatar */
+.avatar {
+  width:42px; height:42px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:16px; flex-shrink:0;
+  border:2px solid rgba(255,255,255,0.15);
+}
+
+/* Phase atmospheres */
+.atm-default { background: radial-gradient(ellipse 80% 60% at 50% -10%, #1a0d3a, transparent), var(--bg); }
+.atm-reveal  { background: radial-gradient(ellipse 80% 60% at 50% -10%, #3a1200, transparent), var(--bg); }
+.atm-vote    { background: radial-gradient(ellipse 80% 60% at 50% -10%, #3a0000, transparent), var(--bg); }
+.atm-solo    { background: radial-gradient(ellipse 60% 80% at 50% 0%, #2a1800, transparent), var(--bg); }
+.atm-scores  { background: radial-gradient(ellipse 80% 60% at 50% -10%, #2a1a00, transparent), var(--bg); }
+.atm-hints   { background: radial-gradient(ellipse 80% 60% at 50% -10%, #001a2a, transparent), var(--bg); }
+
+/* Firebase error banner */
+.fb-banner {
+  background: rgba(220,38,38,0.1);
+  border: 1.5px solid rgba(220,38,38,0.4);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.fb-banner code {
+  display:block; background:rgba(0,0,0,0.4); border-radius:8px;
+  padding:8px 12px; margin:8px 0; font-size:12px;
+  color:#fca5a5; font-family:monospace; white-space:pre;
+}
+
+/* Challenge card */
+.challenge-card {
+  border-radius:20px; padding:28px 24px; text-align:center;
+  position:relative; overflow:hidden;
+}
+.challenge-card::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%);
+}
+.challenge-card-label {
+  font-family:var(--font-d); font-size:32px; letter-spacing:0.05em;
+  color:#fff; margin:10px 0 8px;
+}
+.challenge-card-rule { font-size:15px; font-weight:600; opacity:0.88; line-height:1.55; }
+.challenge-card-cat {
+  font-size:10px; font-weight:800; letter-spacing:0.12em;
+  text-transform:uppercase; opacity:0.6; margin-bottom:4px;
+}
+
+/* Voting dots */
+.vote-dot { width:14px; height:14px; border-radius:50%; background:var(--border); transition:all 0.3s; }
+.vote-dot.voted { background:var(--coral); box-shadow:0 0 8px var(--coral)88; }
+
+/* Drum button */
+.drum-btn {
+  background:var(--s3); border:2px solid var(--border);
+  border-radius:50%; width:88px; height:88px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:36px; cursor:pointer; transition:all 0.15s;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+.drum-btn:active, .drum-btn.drumming { 
+  transform:scale(0.92); 
+  box-shadow:0 0 40px var(--gold)66, 0 4px 24px rgba(0,0,0,0.4);
+  border-color:var(--gold);
+  animation:drum 0.1s ease;
+}
+
+/* Spotlight */
+.spotlight-wrap {
+  position:relative;
+}
+.spotlight-wrap::before {
+  content:'';
+  position:absolute; top:-60px; left:50%; transform:translateX(-50%);
+  width:300px; height:300px;
+  background:radial-gradient(ellipse at 50% 0%, rgba(244,197,66,0.22) 0%, transparent 70%);
+  animation:spotlight 2s ease-in-out infinite;
+  pointer-events:none;
+}
+
+/* React score bar */
+.score-bar-wrap { background:var(--border); border-radius:4px; height:8px; overflow:hidden; }
+.score-bar { height:100%; border-radius:4px; transition:width 1.4s cubic-bezier(0.22,1,0.36,1); }
+
+/* Reaction btn */
+.reaction-btn {
+  flex:1; padding:14px 8px; border:2px solid var(--border);
+  border-radius:14px; background:rgba(255,255,255,0.04);
+  cursor:pointer; font-size:24px; text-align:center;
+  transition:all 0.2s; position:relative;
+}
+.reaction-btn.active { border-color:var(--gold); background:rgba(244,197,66,0.12); }
+.reaction-btn:active { transform:scale(0.9); }
+.reaction-count { display:block; font-size:11px; font-weight:700; color:var(--sub); margin-top:2px; font-family:var(--font-b); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+// ═══════════════════════════════════════════════════════
+// FIREBASE BACKEND (works in real browsers, not artifact sandbox)
+// ═══════════════════════════════════════════════════════
+const FB_URL = "https://imposterbeat-1c0de-default-rtdb.firebaseio.com";
+let fbError = null;
+
+async function fbFetch(path, opts = {}) {
+  const url = `${FB_URL}${path}.json`;
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), 8000);
+  try {
+    const r = await fetch(url, { ...opts, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (r.status === 401 || r.status === 403) {
+      fbError = "rules";
+      throw new Error("FIREBASE_RULES");
+    }
+    fbError = null;
+    return r;
+  } catch (e) {
+    clearTimeout(tid);
+    if (e.message === "FIREBASE_RULES") throw e;
+    if (e.name === "AbortError") { fbError = "timeout"; throw new Error("TIMEOUT"); }
+    fbError = "network";
+    throw new Error("NETWORK");
+  }
+}
+
+const db = {
+  async get(path) {
+    const r = await fbFetch(path);
+    return r.json();
+  },
+  async set(path, data) {
+    await fbFetch(path, { method: "PUT", body: JSON.stringify(data), headers: { "Content-Type": "application/json" } });
+  },
+  async patch(path, data) {
+    await fbFetch(path, { method: "PATCH", body: JSON.stringify(data), headers: { "Content-Type": "application/json" } });
+  },
+};
+
+function deepMerge(base, patch) {
+  const out = { ...base };
+  for (const k of Object.keys(patch)) {
+    if (patch[k] !== null && typeof patch[k] === "object" && !Array.isArray(patch[k]) && base[k] && typeof base[k] === "object") {
+      out[k] = deepMerge(base[k], patch[k]);
+    } else { out[k] = patch[k]; }
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════
+// SONG BANK & CHALLENGE CARDS
+// ═══════════════════════════════════════════════════════
+const SONGS = [
+  {id:1,title:"Smells Like Teen Spirit",artist:"Nirvana",genre:"Grunge",year:1991,decade:90},
+  {id:2,title:"I Will Always Love You",artist:"Whitney Houston",genre:"R&B Ballad",year:1992,decade:90},
+  {id:3,title:"Creep",artist:"Radiohead",genre:"Alternative Rock",year:1992,decade:90},
+  {id:4,title:"Killing Me Softly",artist:"Fugees",genre:"R&B Hip-Hop",year:1996,decade:90},
+  {id:5,title:"Wannabe",artist:"Spice Girls",genre:"Pop",year:1996,decade:90},
+  {id:6,title:"My Heart Will Go On",artist:"Celine Dion",genre:"Pop Ballad",year:1997,decade:90},
+  {id:7,title:"Baby One More Time",artist:"Britney Spears",genre:"Pop",year:1998,decade:90},
+  {id:8,title:"Believe",artist:"Cher",genre:"Dance Pop",year:1998,decade:90},
+  {id:9,title:"No Scrubs",artist:"TLC",genre:"R&B",year:1999,decade:90},
+  {id:10,title:"Gangsta's Paradise",artist:"Coolio ft. L.V.",genre:"Hip-Hop",year:1995,decade:90},
+  {id:11,title:"Wonderwall",artist:"Oasis",genre:"Britpop",year:1995,decade:90},
+  {id:12,title:"Macarena",artist:"Los Del Rio",genre:"Latin Pop",year:1995,decade:90},
+  {id:13,title:"Vogue",artist:"Madonna",genre:"Dance Pop",year:1990,decade:90},
+  {id:14,title:"Enter Sandman",artist:"Metallica",genre:"Heavy Metal",year:1991,decade:90},
+  {id:15,title:"Bohemian Rhapsody",artist:"Queen",genre:"Rock Opera",year:1975,decade:70},
+  {id:16,title:"Don't Stop Me Now",artist:"Queen",genre:"Classic Rock",year:1978,decade:70},
+  {id:17,title:"Africa",artist:"Toto",genre:"Soft Rock",year:1982,decade:80},
+  {id:18,title:"Take On Me",artist:"a-ha",genre:"Synth-Pop",year:1985,decade:80},
+  {id:19,title:"Girls Just Want to Have Fun",artist:"Cyndi Lauper",genre:"New Wave Pop",year:1983,decade:80},
+  {id:20,title:"Eye of the Tiger",artist:"Survivor",genre:"Arena Rock",year:1982,decade:80},
+  {id:21,title:"Sweet Child O Mine",artist:"Guns N Roses",genre:"Hard Rock",year:1987,decade:80},
+  {id:22,title:"Don't Stop Believin",artist:"Journey",genre:"Arena Rock",year:1981,decade:80},
+  {id:23,title:"Dancing Queen",artist:"ABBA",genre:"Disco Pop",year:1976,decade:70},
+  {id:24,title:"Hotel California",artist:"Eagles",genre:"Soft Rock",year:1977,decade:70},
+  {id:25,title:"Livin on a Prayer",artist:"Bon Jovi",genre:"Glam Metal",year:1986,decade:80},
+  {id:26,title:"Purple Rain",artist:"Prince",genre:"Pop R&B",year:1984,decade:80},
+  {id:27,title:"With or Without You",artist:"U2",genre:"Rock",year:1987,decade:80},
+  {id:28,title:"Like a Prayer",artist:"Madonna",genre:"Pop Gospel",year:1989,decade:80},
+  {id:29,title:"Poker Face",artist:"Lady Gaga",genre:"Electropop",year:2008,decade:2000},
+  {id:30,title:"Bad Romance",artist:"Lady Gaga",genre:"Electropop",year:2009,decade:2000},
+  {id:31,title:"Crazy in Love",artist:"Beyoncé ft. Jay-Z",genre:"R&B Pop",year:2003,decade:2000},
+  {id:32,title:"Hey Ya!",artist:"OutKast",genre:"Funk Hip-Hop",year:2003,decade:2000},
+  {id:33,title:"In the End",artist:"Linkin Park",genre:"Nu-Metal",year:2000,decade:2000},
+  {id:34,title:"Lose Yourself",artist:"Eminem",genre:"Hip-Hop",year:2002,decade:2000},
+  {id:35,title:"Mr. Brightside",artist:"The Killers",genre:"Indie Rock",year:2003,decade:2000},
+  {id:36,title:"Toxic",artist:"Britney Spears",genre:"Pop Dance",year:2003,decade:2000},
+  {id:37,title:"Yeah!",artist:"Usher ft. Lil Jon",genre:"Crunk R&B",year:2004,decade:2000},
+  {id:38,title:"Gold Digger",artist:"Kanye West ft. Jamie Foxx",genre:"Hip-Hop",year:2005,decade:2000},
+  {id:39,title:"Hips Don't Lie",artist:"Shakira ft. Wyclef Jean",genre:"Latin Pop",year:2006,decade:2000},
+  {id:40,title:"Umbrella",artist:"Rihanna ft. Jay-Z",genre:"R&B Pop",year:2007,decade:2000},
+  {id:41,title:"Beautiful",artist:"Christina Aguilera",genre:"Pop Ballad",year:2002,decade:2000},
+  {id:42,title:"Irreplaceable",artist:"Beyoncé",genre:"R&B Pop",year:2006,decade:2000},
+  {id:43,title:"SexyBack",artist:"Justin Timberlake",genre:"Pop Electronic",year:2006,decade:2000},
+  {id:44,title:"Since U Been Gone",artist:"Kelly Clarkson",genre:"Pop Rock",year:2004,decade:2000},
+  {id:45,title:"Rolling in the Deep",artist:"Adele",genre:"Pop Soul",year:2010,decade:2010},
+  {id:46,title:"Someone Like You",artist:"Adele",genre:"Pop Ballad",year:2011,decade:2010},
+  {id:47,title:"Hello",artist:"Adele",genre:"Pop Ballad",year:2015,decade:2010},
+  {id:48,title:"Shape of You",artist:"Ed Sheeran",genre:"Tropical House Pop",year:2017,decade:2010},
+  {id:49,title:"Uptown Funk",artist:"Mark Ronson ft. Bruno Mars",genre:"Funk Pop",year:2014,decade:2010},
+  {id:50,title:"Happy",artist:"Pharrell Williams",genre:"Neo Soul Funk",year:2013,decade:2010},
+  {id:51,title:"Gangnam Style",artist:"PSY",genre:"K-Pop Electronic",year:2012,decade:2010},
+  {id:52,title:"Call Me Maybe",artist:"Carly Rae Jepsen",genre:"Bubblegum Pop",year:2012,decade:2010},
+  {id:53,title:"Royals",artist:"Lorde",genre:"Indie Pop",year:2013,decade:2010},
+  {id:54,title:"Shake It Off",artist:"Taylor Swift",genre:"Dance Pop",year:2014,decade:2010},
+  {id:55,title:"Hotline Bling",artist:"Drake",genre:"Hip-Hop R&B",year:2015,decade:2010},
+  {id:56,title:"Despacito",artist:"Luis Fonsi ft. Daddy Yankee",genre:"Reggaeton",year:2017,decade:2010},
+  {id:57,title:"Havana",artist:"Camila Cabello",genre:"Latin Pop",year:2017,decade:2010},
+  {id:58,title:"God's Plan",artist:"Drake",genre:"Hip-Hop R&B",year:2018,decade:2010},
+  {id:59,title:"Shallow",artist:"Lady Gaga & Bradley Cooper",genre:"Country Pop",year:2018,decade:2010},
+  {id:60,title:"Thank U Next",artist:"Ariana Grande",genre:"Pop Trap",year:2018,decade:2010},
+  {id:61,title:"Chandelier",artist:"Sia",genre:"Pop Dance",year:2014,decade:2010},
+  {id:62,title:"Stay With Me",artist:"Sam Smith",genre:"Gospel Soul Pop",year:2014,decade:2010},
+  {id:63,title:"Work",artist:"Rihanna ft. Drake",genre:"Dancehall R&B",year:2016,decade:2010},
+  {id:64,title:"Stressed Out",artist:"Twenty One Pilots",genre:"Alt Hip-Hop",year:2015,decade:2010},
+  {id:65,title:"We Found Love",artist:"Rihanna ft. Calvin Harris",genre:"Electronic Dance",year:2011,decade:2010},
+  {id:66,title:"Closer",artist:"The Chainsmokers ft. Halsey",genre:"Electronic Indie",year:2016,decade:2010},
+  {id:67,title:"Somebody That I Used to Know",artist:"Gotye ft. Kimbra",genre:"Indie Art Pop",year:2011,decade:2010},
+  {id:68,title:"Old Town Road",artist:"Lil Nas X ft. Billy Ray Cyrus",genre:"Country Trap",year:2019,decade:2010},
+  {id:69,title:"Bad Guy",artist:"Billie Eilish",genre:"Dark Pop",year:2019,decade:2010},
+  {id:70,title:"Blinding Lights",artist:"The Weeknd",genre:"Synth-Pop",year:2019,decade:2010},
+  {id:71,title:"Levitating",artist:"Dua Lipa",genre:"Disco Pop",year:2020,decade:2020},
+  {id:72,title:"Drivers License",artist:"Olivia Rodrigo",genre:"Indie Pop Ballad",year:2021,decade:2020},
+  {id:73,title:"As It Was",artist:"Harry Styles",genre:"Synth-Pop Indie",year:2022,decade:2020},
+  {id:74,title:"Anti-Hero",artist:"Taylor Swift",genre:"Synth-Pop",year:2022,decade:2020},
+  {id:75,title:"Heat Waves",artist:"Glass Animals",genre:"Indie Dream Pop",year:2020,decade:2020},
+  {id:76,title:"Flowers",artist:"Miley Cyrus",genre:"Disco Pop",year:2023,decade:2020},
+  {id:77,title:"Vampire",artist:"Olivia Rodrigo",genre:"Pop Rock",year:2023,decade:2020},
+  {id:78,title:"Espresso",artist:"Sabrina Carpenter",genre:"Synth-Pop",year:2024,decade:2020},
+  {id:79,title:"Don't Start Now",artist:"Dua Lipa",genre:"Disco Pop",year:2019,decade:2010},
+  {id:80,title:"Dynamite",artist:"BTS",genre:"Pop Disco Funk",year:2020,decade:2020},
+  {id:81,title:"Sunflower",artist:"Post Malone & Swae Lee",genre:"Hip-Hop R&B",year:2018,decade:2010},
+  {id:82,title:"Rockstar",artist:"Post Malone ft. 21 Savage",genre:"Hip-Hop Trap",year:2017,decade:2010},
+  {id:83,title:"Sicko Mode",artist:"Travis Scott ft. Drake",genre:"Hip-Hop Trap",year:2018,decade:2010},
+  {id:84,title:"Cruel Summer",artist:"Taylor Swift",genre:"Synth-Pop",year:2019,decade:2010},
+  {id:85,title:"Counting Stars",artist:"OneRepublic",genre:"Pop Folk",year:2013,decade:2010},
+  {id:86,title:"Paint The Town Red",artist:"Doja Cat",genre:"Hip-Hop Trap",year:2023,decade:2020},
+  {id:87,title:"Senorita",artist:"Shawn Mendes & Camila Cabello",genre:"Latin Pop",year:2019,decade:2010},
+  {id:88,title:"7 Rings",artist:"Ariana Grande",genre:"Pop Trap",year:2019,decade:2010},
+  {id:89,title:"Moves Like Jagger",artist:"Maroon 5",genre:"Pop Funk",year:2011,decade:2010},
+  {id:90,title:"Titanium",artist:"David Guetta ft. Sia",genre:"Electronic Dance",year:2011,decade:2010},
+  {id:91,title:"Lean On",artist:"Major Lazer & DJ Snake",genre:"Electronic Dancehall",year:2015,decade:2010},
+  {id:92,title:"Apologize",artist:"Timbaland ft. OneRepublic",genre:"Pop Electronic",year:2007,decade:2000},
+  {id:93,title:"Walking on Sunshine",artist:"Katrina and the Waves",genre:"Pop Rock",year:1985,decade:80},
+  {id:94,title:"Bad Habit",artist:"Steve Lacy",genre:"Indie R&B",year:2022,decade:2020},
+  {id:95,title:"Stairway to Heaven",artist:"Led Zeppelin",genre:"Hard Rock Folk",year:1971,decade:70},
+  {id:96,title:"Numb",artist:"Linkin Park",genre:"Nu-Metal",year:2003,decade:2000},
+  {id:97,title:"Watermelon Sugar",artist:"Harry Styles",genre:"Pop Soft Rock",year:2019,decade:2010},
+  {id:98,title:"Thrift Shop",artist:"Macklemore & Ryan Lewis",genre:"Hip-Hop Alt",year:2012,decade:2010},
+  {id:99,title:"Blurred Lines",artist:"Robin Thicke ft. Pharrell",genre:"R&B Pop Funk",year:2013,decade:2010},
+  {id:100,title:"Industry Baby",artist:"Lil Nas X ft. Jack Harlow",genre:"Hip-Hop Pop",year:2021,decade:2020},
+];
+
+// Challenge cards with category-specific colors
+const CAT_COLORS = {
+  pantomime: { bg:"#0d1f2d", border:"#0ea5e9", accent:"#38bdf8", label:"Pantomime" },
+  scenario:  { bg:"#1f0d1f", border:"#a855f7", accent:"#c084fc", label:"Scenario"  },
+  constraint:{ bg:"#1f1a0d", border:"#f59e0b", accent:"#fbbf24", label:"Constraint"},
+  performance:{ bg:"#1f0d10",border:"#ef4444", accent:"#f87171", label:"Performance"},
+};
+
+const CHALLENGES = [
+  {id:"panto",label:"Full Pantomime",emoji:"🙌",rule:"ZERO sounds. Act it out with your whole body. No humming, no lip sync.",cat:"pantomime"},
+  {id:"statue",label:"Frozen Statue",emoji:"🗿",rule:"Strike ONE single pose. Hold perfectly still.",cat:"pantomime"},
+  {id:"airband",label:"Air Band",emoji:"🎸",rule:"Play an invisible instrument with FULL commitment and zero shame.",cat:"pantomime"},
+  {id:"dance",label:"Interpretive Dance",emoji:"💃",rule:"Dance like this song is the last music on Earth. No words — only movement.",cat:"pantomime"},
+  {id:"slowmo",label:"Slow Motion",emoji:"🐌",rule:"Act out the song's energy in EXTREME slow motion. 5× slower than normal.",cat:"pantomime"},
+  {id:"funeral",label:"Funeral Scene",emoji:"⚰️",rule:"Describe the person whose funeral this song plays at. Be specific. Be ruthless.",cat:"scenario"},
+  {id:"villain",label:"Villain Entrance",emoji:"😈",rule:"What villain walks in to this song? Describe their outfit and evil plan.",cat:"scenario"},
+  {id:"wedding",label:"Wedding Disaster",emoji:"💒",rule:"Describe the couple who chose this as their first dance. How did it end?",cat:"scenario"},
+  {id:"commercial",label:"Worst Ad Ever",emoji:"📺",rule:"This song is a TV commercial for the WRONG product. Pitch the ad out loud.",cat:"scenario"},
+  {id:"breakup",label:"Dramatic Breakup",emoji:"💔",rule:"You're breaking up with someone and this plays in the background. Act it out.",cat:"scenario"},
+  {id:"jobinterview",label:"Song's Job Interview",emoji:"💼",rule:"This song is applying for a job. Interview it out loud.",cat:"scenario"},
+  {id:"elevator",label:"Elevator Situation",emoji:"🛗",rule:"Stuck in an elevator for 10 min with a stranger and this song plays.",cat:"scenario"},
+  {id:"emoji",label:"Emoji Only",emoji:"📱",rule:"Mime drawing emojis in the air. Emojis only. No words or sounds.",cat:"constraint"},
+  {id:"oneword",label:"One Word Only",emoji:"☝️",rule:"Your ENTIRE hint is exactly ONE word. Choose wisely.",cat:"constraint"},
+  {id:"opposite",label:"Opposite Day",emoji:"🙃",rule:"EVERYTHING you say must be the opposite of what you mean.",cat:"constraint"},
+  {id:"question",label:"Questions Only",emoji:"❓",rule:"Every word must be a question. Not a single statement allowed.",cat:"constraint"},
+  {id:"robot",label:"Robot Mode",emoji:"🤖",rule:"Speak. Like. A. Complete. Robot. Monotone. Zero. Emotion.",cat:"constraint"},
+  {id:"auctioneer",label:"Speed Auctioneer",emoji:"🔨",rule:"Speak AS FAST AS HUMANLY POSSIBLE like you're auctioning this song.",cat:"constraint"},
+  {id:"foodmenu",label:"Restaurant Menu",emoji:"🍕",rule:"This song is a dish. Describe ingredients, taste, wine pairing, chef's note.",cat:"constraint"},
+  {id:"badreview",label:"Furious 1-Star Review",emoji:"⭐",rule:"Write an outraged, petty 1-star review. Maximum Karen energy.",cat:"constraint"},
+  {id:"celeb",label:"Celebrity Impression",emoji:"🌟",rule:"Give your hint while impersonating a celebrity. Announce who first.",cat:"performance"},
+  {id:"accent",label:"Mystery Accent",emoji:"🌍",rule:"Give your hint in the most dramatic foreign accent you can manage.",cat:"performance"},
+  {id:"sing",label:"Sing Your Hint",emoji:"🎤",rule:"SING your entire hint to a melody you make up on the spot.",cat:"performance"},
+  {id:"shakespeare",label:"Shakespearean",emoji:"📜",rule:"Speaketh thy hint in the most theatrical Old English thou canst muster.",cat:"performance"},
+  {id:"sports",label:"Sports Commentary",emoji:"📣",rule:"Narrate your hint as a live sports commentator. Maximum drama.",cat:"performance"},
+  {id:"newsanchor",label:"Breaking News",emoji:"📰",rule:"You are a serious TV news anchor reporting this song as breaking news.",cat:"performance"},
+  {id:"documentary",label:"Nature Documentary",emoji:"🦁",rule:"Narrate like David Attenborough describing a rare animal. Hushed tone.",cat:"performance"},
+  {id:"babyvoice",label:"Baby Talk",emoji:"👶",rule:"Explain this song like you are a very enthusiastic 2-year-old.",cat:"performance"},
+];
+
+const BETWEEN_MSGS = [
+  "🎵 Everyone hum the chorus of their favorite song — simultaneously. Right now.",
+  "🥁 Someone beatboxes for 10 seconds. The group picks who. No refusing.",
+  "🎸 Stand up. Air guitar solo. Everyone. Zero exceptions.",
+  "🕺 30-second dance break. Host picks the style. GO.",
+  "🎹 Group hum of any famous movie soundtrack. As dramatic as possible.",
+  "🎺 Everyone makes the sound of their least favorite instrument. Together. Now.",
+];
+
+// Player color palette (agent upgrade: color-coded avatars)
+const PLAYER_COLORS = ["#FF5F3F","#00C9A7","#F4C542","#a855f7","#3b82f6","#ec4899","#f97316","#22d3ee","#84cc16","#e11d48"];
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+function shuffle(a) {
+  const r = [...a];
+  for (let i = r.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [r[i],r[j]] = [r[j],r[i]];
+  }
+  return r;
+}
+function genCode() {
+  const c = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  return Array.from({length:4}, () => c[Math.floor(Math.random()*c.length)]).join("");
+}
+function playerColor(name, players) {
+  const idx = players?.indexOf(name) ?? 0;
+  return PLAYER_COLORS[idx % PLAYER_COLORS.length];
+}
+function initials(name) {
+  return name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+}
+
+// Deep-link support (agent upgrade: URL-based room sharing)
+function getRoomFromHash() {
+  const h = window.location.hash;
+  const m = h.match(/^#join\/([A-Z0-9]{4})$/);
+  return m ? m[1] : null;
+}
+function setRoomHash(code) {
+  history.replaceState(null, "", `#join/${code}`);
+}
+function clearHash() {
+  history.replaceState(null, "", window.location.pathname);
+}
+
+// ═══════════════════════════════════════════════════════
+// WEB AUDIO SOUND ENGINE
+// ═══════════════════════════════════════════════════════
+let actx = null;
+function ac() {
+  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+  if (actx.state === "suspended") actx.resume();
+  return actx;
+}
+function tone(freq, type, start, dur, vol=0.22, fadeOut=true) {
+  const c=ac(), o=c.createOscillator(), g=c.createGain();
+  o.connect(g); g.connect(c.destination);
+  o.type=type; o.frequency.value=freq;
+  g.gain.setValueAtTime(vol, c.currentTime+start);
+  if (fadeOut) g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+start+dur);
+  o.start(c.currentTime+start); o.stop(c.currentTime+start+dur+0.05);
+}
+function noise(start, dur, vol=0.08) {
+  const c=ac(), buf=c.createBuffer(1,c.sampleRate*dur,c.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  const s=c.createBufferSource(), g=c.createGain();
+  s.buffer=buf; s.connect(g); g.connect(c.destination);
+  g.gain.setValueAtTime(vol, c.currentTime+start);
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+start+dur);
+  s.start(c.currentTime+start); s.stop(c.currentTime+start+dur+0.1);
+}
+
+const SFX = {
+  whoosh() {
+    const c=ac(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g); g.connect(c.destination); o.type="sine";
+    o.frequency.setValueAtTime(120,c.currentTime);
+    o.frequency.exponentialRampToValueAtTime(800,c.currentTime+0.22);
+    g.gain.setValueAtTime(0.14,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.22);
+    o.start(c.currentTime); o.stop(c.currentTime+0.25);
+  },
+  fanfare() {
+    [[523,0],[659,.14],[784,.28],[1047,.46],[1319,.6]].forEach(([f,t]) => tone(f,"square",t,.28,.15));
+    [[523,0.1],[659,.2],[784,.34]].forEach(([f,t]) => tone(f,"triangle",t,.3,.08));
+  },
+  tick() { tone(1100,"square",0,.04,.09); },
+  correct() { [523,659,784,1047].forEach((f,i) => tone(f,"sine",i*.1,.22,.2)); },
+  reveal() {
+    noise(0,.12,.15);
+    [200,160,120,500,900,1400].forEach((f,i) => tone(f,"sawtooth",i*.04,.1,.1));
+    tone(1200,"sine",.35,.5,.22);
+  },
+  drumHit(intensity=1) {
+    const c=ac();
+    // Bass drum
+    const o=c.createOscillator(), g=c.createGain();
+    o.connect(g); g.connect(c.destination); o.type="sine";
+    o.frequency.setValueAtTime(120*intensity, c.currentTime);
+    o.frequency.exponentialRampToValueAtTime(40, c.currentTime+0.08);
+    g.gain.setValueAtTime(0.6*intensity, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+0.2);
+    o.start(c.currentTime); o.stop(c.currentTime+0.22);
+    // Snare noise
+    noise(0, 0.1, 0.12*intensity);
+  },
+  suspense() {
+    // Heartbeat
+    [0, 0.15, 0.9, 1.05, 1.9, 2.05].forEach(t => {
+      tone(80,"sine",t,.18,.18);
+      noise(t,.08,.06);
+    });
+  },
+  victory() {
+    const notes = [523,659,784,1047,1319,1047,784,659,523];
+    notes.forEach((f,i) => tone(f,"sine",i*.07,.15,.22));
+    noise(.5,.4,.05);
+  },
+  reaction() { tone(800+Math.random()*400,"sine",0,.1,.15); },
+};
+
+// ═══════════════════════════════════════════════════════
+// CLAUDE API JUDGE (agent upgrade: multiple personalities)
+// ═══════════════════════════════════════════════════════
+const JUDGE_PERSONALITIES = [
+  { id:"drama", label:"Drama Queen", emoji:"💅", system:"You are a devastatingly dramatic theater queen judging a party game. Over-the-top, theatrical, uses words like 'GHASTLY' and 'SCANDALOUS'. Give a 2-3 sentence dramatic verdict." },
+  { id:"sports", label:"Sports Commentator", emoji:"📣", system:"You are an intense sports commentator covering a party game like it's the Super Bowl. High energy, statistics-obsessed, dramatic pauses. 2-3 sentences." },
+  { id:"sherlock", label:"Detective", emoji:"🔍", system:"You are Sherlock Holmes analyzing a deduction game. Cold, logical, but occasionally cutting. Use 'Elementary' somewhere. 2-3 sentences." },
+  { id:"attenborough", label:"Nature Doc", emoji:"🦁", system:"You are David Attenborough narrating this party game as a wildlife documentary. Hushed awe, nature metaphors, treat players like exotic animals. 2-3 sentences." },
+];
+
+async function askJudge(prompt, personality) {
+  const p = JUDGE_PERSONALITIES.find(j=>j.id===personality) || JUDGE_PERSONALITIES[0];
+  try {
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:250,
+        messages:[{role:"user",content:prompt}],
+        system: p.system + " Never reveal who the actual imposter is.",
+      }),
+    });
+    const data = await resp.json();
+    return data.content?.[0]?.text || "The verdict is unclear...";
+  } catch {
+    return "The judge has lost their voice momentarily. Proceed with human instincts! 🎤";
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// YOUTUBE MODAL
+// ═══════════════════════════════════════════════════════
+function YouTubeModal({ title, artist, onClose }) {
+  const [videoId, setVideoId] = useState(null);
+  const [status, setStatus] = useState("searching");
+  const [preview, setPreview] = useState(null);
+
+  useEffect(() => {
+    let dead = false;
+    async function find() {
+      const instances = ["https://inv.tux.pizza","https://invidious.nerdvpn.de","https://invidious.privacyredirect.com","https://yt.cdaut.de"];
+      const q = encodeURIComponent(`${title} ${artist} official audio`);
+      for (const base of instances) {
+        try {
+          const r = await fetch(`${base}/api/v1/search?q=${q}&type=video&fields=videoId`, {signal: (() => { const c = new AbortController(); setTimeout(() => c.abort(), 5000); return c.signal; })()});
+          if (!r.ok) continue;
+          const d = await r.json();
+          const vid = d?.[0]?.videoId;
+          if (vid && !dead) { setVideoId(vid); setStatus("found"); return; }
+        } catch {}
+      }
+      if (!dead) {
+        try {
+          const d = await (await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(title+" "+artist)}&media=music&limit=5`)).json();
+          const m = d.results?.find(x=>x.previewUrl);
+          if (m && !dead) { setPreview(m.previewUrl); setStatus("fallback"); return; }
+        } catch {}
+        if (!dead) setStatus("error");
+      }
+    }
+    find();
+    return () => { dead = true; };
+  }, [title, artist]);
+
+  return (
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.92)",zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:16,backdropFilter:"blur(8px)"}} onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="scale-in" style={{width:"100%",maxWidth:420,background:"var(--s2)",borderRadius:24,border:"1px solid var(--border2)",overflow:"hidden",boxShadow:"0 24px 80px rgba(0,0,0,0.7)"}}>
+        <div style={{padding:"14px 18px",display:"flex",justifyContent:"space-between",alignItems:"flex-start",borderBottom:"1px solid var(--border)"}}>
+          <div>
+            <div style={{color:"var(--sub)",fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>
+              {{found:"▶ Full Song",fallback:"♫ 30s Preview",searching:"🔍 Searching...",error:"❌ Not Found"}[status]}
+            </div>
+            <div style={{color:"var(--text)",fontFamily:"var(--font-d)",fontSize:22,letterSpacing:"0.03em",lineHeight:1.1}}>{title}</div>
+            <div style={{color:"var(--sub)",fontSize:13,marginTop:2}}>{artist}</div>
+          </div>
+          <button onClick={onClose} style={{background:"rgba(255,255,255,0.08)",border:"1px solid var(--border)",color:"var(--sub)",borderRadius:10,padding:"7px 13px",cursor:"pointer",fontSize:14,fontWeight:700}}>✕</button>
+        </div>
+        <div style={{padding:16}}>
+          {status==="searching" && <div style={{textAlign:"center",padding:"32px 0",color:"var(--sub)"}}>
+            <div style={{fontSize:32,animation:"pulse 1s infinite",marginBottom:8}}>🎵</div>
+            <div style={{fontWeight:600}}>Finding song...</div>
+          </div>}
+          {status==="found" && videoId && <iframe src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`} allow="autoplay; encrypted-media; fullscreen" allowFullScreen style={{width:"100%",height:220,border:"none",borderRadius:14,display:"block"}}/>}
+          {status==="fallback" && preview && <div style={{textAlign:"center",padding:"16px 0"}}>
+            <div style={{color:"var(--gold)",fontWeight:700,marginBottom:12}}>30-second preview</div>
+            <audio controls autoPlay src={preview} style={{width:"100%"}}/>
+          </div>}
+          {status==="error" && <div style={{textAlign:"center",padding:"24px 0",color:"var(--sub)"}}>
+            <div style={{fontSize:30,marginBottom:8}}>😞</div>
+            <div>Search: "{title} {artist}"</div>
+          </div>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Music player hook
+function useMusicPlayer() {
+  const [ytSong, setYtSong] = useState(null);
+  const play = useCallback((title,artist) => setYtSong({title,artist}), []);
+  const stop = useCallback(() => setYtSong(null), []);
+  return { play, stop, ytSong };
+}
+
+// ═══════════════════════════════════════════════════════
+// CONFETTI
+// ═══════════════════════════════════════════════════════
+function Confetti({ active }) {
+  const ref = useRef();
+  useEffect(() => {
+    if (!active) return;
+    const cv = ref.current; if (!cv) return;
+    const ctx = cv.getContext("2d");
+    cv.width = window.innerWidth; cv.height = window.innerHeight;
+    const colors = ["#FF5F3F","#F4C542","#00C9A7","#a855f7","#3b82f6","#ec4899","#fbbf24"];
+    let pts = Array.from({length:130}, () => ({
+      x:Math.random()*cv.width, y:-20,
+      vx:(Math.random()-.5)*7, vy:Math.random()*5+2,
+      color:rand(colors), s:Math.random()*10+4,
+      r:Math.random()*360, rv:(Math.random()-.5)*8, l:1,
+    }));
+    let af;
+    const draw = () => {
+      ctx.clearRect(0,0,cv.width,cv.height);
+      pts.forEach(p => {
+        p.x+=p.vx; p.y+=p.vy; p.r+=p.rv; p.l-=0.005;
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r*Math.PI/180);
+        ctx.globalAlpha=Math.max(0,p.l); ctx.fillStyle=p.color;
+        ctx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); ctx.restore();
+      });
+      pts = pts.filter(p=>p.l>0);
+      if (pts.length>0) af=requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(af);
+  }, [active]);
+  if (!active) return null;
+  return <canvas ref={ref} style={{position:"fixed",top:0,left:0,pointerEvents:"none",zIndex:999}}/>;
+}
+
+// ═══════════════════════════════════════════════════════
+// CIRCULAR TIMER
+// ═══════════════════════════════════════════════════════
+function CircularTimer({ s, total=30 }) {
+  const r=46, circ=2*Math.PI*r;
+  const pct = s/total;
+  const color = s>15?"#00C9A7":s>7?"#F4C542":"#FF5F3F";
+  return (
+    <div style={{position:"relative",width:116,height:116,margin:"0 auto"}}>
+      <svg width="116" height="116" style={{transform:"rotate(-90deg)"}}>
+        <circle cx="58" cy="58" r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="9"/>
+        <circle cx="58" cy="58" r={r} fill="none" stroke={color} strokeWidth="9"
+          strokeDasharray={circ} strokeDashoffset={circ*(1-pct)}
+          strokeLinecap="round"
+          style={{transition:"stroke-dashoffset .97s linear, stroke .3s"}}/>
+      </svg>
+      <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column"}}>
+        <div className="display" style={{fontSize:34,color,lineHeight:1}}>{s}</div>
+        <div style={{fontSize:10,color:"var(--sub)",fontWeight:700,letterSpacing:1}}>SEC</div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// PLAYER AVATAR (agent upgrade: color-coded avatars)
+// ═══════════════════════════════════════════════════════
+function Avatar({ name, players, size=42, showName=false, isHost=false }) {
+  const color = playerColor(name, players);
+  const init = initials(name);
+  return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:5}}>
+      <div className="avatar" style={{
+        width:size,height:size,background:`${color}22`,
+        borderColor:`${color}66`,color,fontSize:Math.round(size*0.38),
+        position:"relative",
+      }}>
+        {init}
+        {isHost && <div style={{position:"absolute",bottom:-4,right:-4,background:"var(--gold)",borderRadius:"50%",width:14,height:14,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,border:"2px solid var(--bg)"}}>👑</div>}
+      </div>
+      {showName && <div style={{fontSize:11,color:"var(--sub)",fontWeight:600,maxWidth:56,textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{name}</div>}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// CHALLENGE CARD (agent upgrade: full-bleed category design)
+// ═══════════════════════════════════════════════════════
+function ChallengeCardDisplay({ card, compact=false }) {
+  if (!card) return null;
+  const cc = CAT_COLORS[card.cat] || CAT_COLORS.pantomime;
+  return (
+    <div className="challenge-card" style={{background:cc.bg,border:`1.5px solid ${cc.border}55`,boxShadow:`0 0 40px ${cc.accent}22, inset 0 0 60px ${cc.border}11`}}>
+      <div className="challenge-card-cat" style={{color:cc.accent}}>{cc.label}</div>
+      <div style={{fontSize:compact?42:52,margin:"4px 0"}}>{card.emoji}</div>
+      <div className="challenge-card-label" style={{color:cc.accent,fontSize:compact?24:30}}>{card.label}</div>
+      <div className="challenge-card-rule" style={{color:cc.accent === "#38bdf8" ? "#bae6fd" : "#f0e6ff"}}>{card.rule}</div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// FIREBASE SETUP GUIDE
+// ═══════════════════════════════════════════════════════
+function FirebaseSetupGuide({ error }) {
+  const [open, setOpen] = useState(true);
+  if (error === "network") return (
+    <div className="fb-banner" style={{borderColor:"rgba(245,158,11,0.4)",background:"rgba(245,158,11,0.08)"}}>
+      <strong style={{color:"#fbbf24"}}>⚠️ Network error</strong> — Can't reach the game server. Check your internet connection and try again.
+    </div>
+  );
+  if (error !== "rules") return null;
+  return (
+    <div className="fb-banner">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+        <strong style={{color:"#f87171"}}>🔒 One-time Firebase setup needed</strong>
+        <button onClick={()=>setOpen(!open)} style={{background:"none",border:"none",color:"var(--sub)",cursor:"pointer",fontSize:18}}>{open?"▲":"▼"}</button>
+      </div>
+      {open && <>
+        <div style={{color:"#fca5a5",marginBottom:8}}>The database needs public rules. Do this once (2 minutes):</div>
+        <ol style={{paddingLeft:18,color:"#fca5a5",lineHeight:2,fontSize:12}}>
+          <li>Go to <strong>console.firebase.google.com</strong></li>
+          <li>Select <strong>imposterbeat-1c0de</strong> → Realtime Database → Rules</li>
+          <li>Paste this and click <strong>Publish</strong>:</li>
+        </ol>
+        <code>{`{\n  "rules": {\n    ".read": true,\n    ".write": true\n  }\n}`}</code>
+        <div style={{color:"var(--sub)",fontSize:11}}>⚠️ Public rules are fine for a party game with no personal data.</div>
+      </>}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// AI JUDGE COMPONENT (agent upgrade: personality picker)
+// ═══════════════════════════════════════════════════════
+function AIJudge({ room, players }) {
+  const [personality, setPersonality] = useState("drama");
+  const [verdict, setVerdict] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  async function getVerdict() {
+    setLoading(true);
+    const hints = [];
+    if (room.hintLog) {
+      Object.entries(room.hintLog).forEach(([round,ph]) => {
+        const cats=["ARTIST","GENRE","YEAR"];
+        Object.entries(ph).forEach(([player,hint]) => {
+          if (hint) hints.push(`${player} (${cats[round]}): "${hint}"`);
+        });
+      });
+    }
+    const hintText = hints.length ? hints.join("\n") : "No hints recorded yet.";
+    const prompt = `Party game: ${players.length} players, one secret song. Investigators know the song; imposters don't.\n\nPlayers: ${players.join(", ")}\n\nHints given:\n${hintText}\n\nGive your theatrical verdict casting suspicion on specific players based on their hinting patterns.`;
+    const v = await askJudge(prompt, personality);
+    setVerdict(v);
+    setLoading(false);
+  }
+
+  const p = JUDGE_PERSONALITIES.find(j=>j.id===personality);
+  return (
+    <div style={{background:"rgba(168,85,247,0.07)",border:"1px solid rgba(168,85,247,0.25)",borderRadius:20,padding:16,marginBottom:14}}>
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+        <span style={{fontSize:22}}>⚖️</span>
+        <div style={{flex:1}}>
+          <div style={{color:"var(--purple)",fontWeight:800,fontSize:14}}>AI Judge</div>
+          <div style={{color:"var(--sub)",fontSize:11}}>Powered by Claude</div>
+        </div>
+      </div>
+      <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>
+        {JUDGE_PERSONALITIES.map(j=>(
+          <button key={j.id} onClick={()=>{setPersonality(j.id);setVerdict(null);}}
+            style={{padding:"6px 10px",borderRadius:20,border:"1px solid",cursor:"pointer",fontSize:11,fontWeight:700,
+              background:personality===j.id?"var(--purple)":"rgba(255,255,255,0.05)",
+              color:personality===j.id?"#fff":"var(--sub)",
+              borderColor:personality===j.id?"var(--purple)":"var(--border)"}}>
+            {j.emoji} {j.label}
+          </button>
+        ))}
+      </div>
+      <button onClick={getVerdict} disabled={loading}
+        style={{width:"100%",padding:"11px 0",borderRadius:14,border:"none",cursor:loading?"not-allowed":"pointer",
+          background:loading?"var(--s3)":"var(--purple)",color:loading?"var(--sub)":"#fff",
+          fontWeight:800,fontSize:14,fontFamily:"var(--font-b)"}}>
+        {loading?"Judging...":"⚖️ Get Verdict"}
+      </button>
+      {verdict && (
+        <div style={{marginTop:12,color:"#d8b4fe",fontSize:14,lineHeight:1.65,fontStyle:"italic",background:"rgba(0,0,0,0.3)",borderRadius:12,padding:"10px 14px",borderLeft:"2px solid var(--purple)"}}>
+          "{verdict}"
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// PLAY BUTTON
+// ═══════════════════════════════════════════════════════
+function PlayBtn({ title, artist, music, label="▶ Play", color="var(--coral)" }) {
+  return (
+    <button onClick={()=>music.play(title,artist)} className="btn btn-sm" style={{background:color,color:"#fff",border:"none",boxShadow:`0 3px 14px ${color}55`}}>
+      🎵 {label}
+    </button>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// BACK BUTTON
+// ═══════════════════════════════════════════════════════
+function BackBtn({ onClick }) {
+  return (
+    <button onClick={onClick} style={{background:"none",border:"none",color:"var(--sub)",cursor:"pointer",fontSize:14,fontWeight:600,padding:"4px 0",display:"flex",alignItems:"center",gap:6,marginBottom:20}}>
+      <span style={{fontSize:18}}>←</span> Back
+    </button>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// MAIN APP
+// ═══════════════════════════════════════════════════════
+function App() {
+  const [screen, setScreen] = useState(() => getRoomFromHash() ? "join" : "home");
+  const [myName, setMyName] = useState("");
+  const [roomCode, setRoomCode] = useState("");
+  const [isHost, setIsHost] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+  const [codeInput, setCodeInput] = useState(() => getRoomFromHash() || "");
+  const [error, setError] = useState("");
+  const [fbErr, setFbErr] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [room, setRoom] = useState(null);
+  const [myVote, setMyVote] = useState("");
+  const [myGuess, setMyGuess] = useState(null);
+  const [search, setSearch] = useState("");
+  const [hasVoted, setHasVoted] = useState(false);
+  const [hasGuessed, setHasGuessed] = useState(false);
+  const [hasReadyRole, setHasReadyRole] = useState(false);
+  const [confetti, setConfetti] = useState(false);
+  const [timer, setTimer] = useState(30);
+  const [timerOn, setTimerOn] = useState(false);
+  const [myHintText, setMyHintText] = useState("");
+  const [drumming, setDrumming] = useState(false);
+  const [reactions, setReactions] = useState({});
+  const [roleVisible, setRoleVisible] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const pollRef = useRef(null);
+  const timerRef = useRef(null);
+  const music = useMusicPlayer();
+
+  // Poll Firebase
+  useEffect(() => {
+    if (!roomCode || ["home","create","join","guide"].includes(screen)) return;
+    const poll = async () => {
+      try {
+        const r = await db.get(`/rooms/${roomCode}`);
+        if (r) { setRoom(r); setFbErr(null); }
+      } catch(e) {
+        if (e.message === "FIREBASE_RULES") setFbErr("rules");
+        else if (e.message === "NETWORK") setFbErr("network");
+      }
+    };
+    poll();
+    pollRef.current = setInterval(poll, 800);
+    return () => clearInterval(pollRef.current);
+  }, [roomCode, screen]);
+
+  // Phase resets
+  useEffect(() => {
+    if (!room) return;
+    if (room.phase === "voting") { setMyVote(""); setHasVoted(false); }
+    if (room.phase === "imposter_guess") { setMyGuess(null); setHasGuessed(false); setSearch(""); }
+    if (room.phase === "role_reveal") { setHasReadyRole(false); setRoleVisible(false); }
+  }, [room?.phase]);
+
+  // Timer
+  useEffect(() => {
+    if (timerOn && timer > 0) {
+      timerRef.current = setTimeout(() => {
+        setTimer(t => t-1);
+        if (timer <= 5) SFX.tick();
+      }, 1000);
+    } else if (timer === 0) setTimerOn(false);
+    return () => clearTimeout(timerRef.current);
+  }, [timerOn, timer]);
+
+  const myRole = room?.roles?.[myName];
+  const amImposter = myRole === "imposter";
+  const players = room?.players || [];
+  const song = room?.song;
+  const imposters = players.filter(p => room?.roles?.[p] === "imposter");
+  const catKeys = ["artist","genre","year"];
+  const CATS = ["ARTIST","GENRE","YEAR"];
+
+  function getTopVoted() {
+    const tot = {}; players.forEach(p => tot[p] = 0);
+    Object.values(room?.votes || {}).forEach(v => { if (tot[v] !== undefined) tot[v]++; });
+    return Object.entries(tot).sort((a,b) => b[1]-a[1]).slice(0, imposters.length).map(e=>e[0]);
+  }
+
+  async function withFbError(fn) {
+    try { await fn(); setFbErr(null); }
+    catch(e) {
+      if (e.message === "FIREBASE_RULES") setFbErr("rules");
+      else if (e.message === "NETWORK") setFbErr("network");
+    }
+  }
+
+  async function createRoom() {
+    if (!nameInput.trim()) { setError("Enter your name"); return; }
+    setLoading(true); setError("");
+    const code = genCode();
+    try {
+      await db.set(`/rooms/${code}`, {
+        phase:"waiting", host:nameInput.trim(), players:[nameInput.trim()],
+        impostersCount:1, createdAt:Date.now()
+      });
+      setMyName(nameInput.trim()); setRoomCode(code); setIsHost(true);
+      setRoomHash(code); setScreen("lobby");
+    } catch(e) {
+      if (e.message === "FIREBASE_RULES") setFbErr("rules");
+      setError("Connection failed — check Firebase setup above.");
+    }
+    setLoading(false);
+  }
+
+  async function joinRoom() {
+    if (!nameInput.trim()) { setError("Enter your name"); return; }
+    if (!codeInput.trim()) { setError("Enter room code"); return; }
+    setLoading(true); setError("");
+    const code = codeInput.trim().toUpperCase();
+    try {
+      const r = await db.get(`/rooms/${code}`);
+      if (!r) { setError("Room not found — check the code."); setLoading(false); return; }
+      if (r.phase !== "waiting") { setError("Game already in progress."); setLoading(false); return; }
+      const nm = nameInput.trim();
+      if ((r.players||[]).includes(nm)) { setError("Name taken. Pick another."); setLoading(false); return; }
+      await db.set(`/rooms/${code}`, deepMerge(r, {players:[...r.players,nm]}));
+      setMyName(nm); setRoomCode(code); setIsHost(false); clearHash(); setScreen("lobby");
+    } catch(e) {
+      if (e.message === "FIREBASE_RULES") { setFbErr("rules"); setError("Database connection error — see setup guide above."); }
+      else setError("Connection failed — check your internet connection.");
+    }
+    setLoading(false);
+  }
+
+  async function startGame() {
+    if (players.length < 3) { setError("Need at least 3 players"); return; }
+    const s = rand(SONGS), sh = shuffle(players), roles = {};
+    players.forEach(p => roles[p] = "investigator");
+    for (let i=0; i < Math.min(room.impostersCount||1, players.length-2); i++) roles[sh[i]] = "imposter";
+    const hints = [0,1,2].map(() => players.map(() => rand(CHALLENGES)));
+    const scores = {}; players.forEach(p => scores[p]=0);
+    const colors = {}; players.forEach((p,i) => colors[p] = PLAYER_COLORS[i%PLAYER_COLORS.length]);
+    await withFbError(() => db.set(`/rooms/${roomCode}`, {
+      ...room, phase:"role_reveal", song:s, roles, hints, round:0, currentPlayer:0,
+      speechIdx:0, votes:{}, guesses:{}, soloIdx:0, scores, colors,
+      revealed:{}, ready:{}, betweenMsg:"", hintLog:{}, reactions:{},
+    }));
+    SFX.fanfare();
+  }
+
+  const myRole2 = room?.roles?.[myName];
+  const amImposter2 = myRole2 === "imposter";
+
+  // ── HOME ──────────────────────────────────────────────────────────────
+  if (screen === "home") return (
+    <div className="atm-default" style={{minHeight:"100dvh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"32px 20px",overflow:"hidden",position:"relative"}}>
+      {music.ytSong && <YouTubeModal title={music.ytSong.title} artist={music.ytSong.artist} onClose={music.stop}/>}
+      {/* Decorative rings */}
+      <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:400,height:400,borderRadius:"50%",border:"1px solid rgba(255,95,63,0.06)",pointerEvents:"none"}}/>
+      <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:550,height:550,borderRadius:"50%",border:"1px solid rgba(255,95,63,0.03)",pointerEvents:"none"}}/>
+
+      <div className="container" style={{textAlign:"center",position:"relative"}}>
+        <div className="fade-up" style={{marginBottom:6}}>
+          <div style={{fontSize:11,color:"var(--sub)",fontWeight:700,letterSpacing:4,textTransform:"uppercase",marginBottom:16}}>
+            Party Game
+          </div>
+          <div style={{position:"relative",display:"inline-block",marginBottom:8}}>
+            <div style={{fontSize:88,lineHeight:1,filter:"drop-shadow(0 0 40px rgba(255,95,63,0.5))"}}>🎵</div>
+            <div style={{position:"absolute",inset:0,borderRadius:"50%",background:"radial-gradient(circle,rgba(255,95,63,0.2) 0%,transparent 70%)",animation:"glow 2.5s ease-in-out infinite"}}/>
+          </div>
+        </div>
+        <h1 className="fade-up-2 display" style={{fontSize:"clamp(62px,18vw,96px)",letterSpacing:"0.04em",lineHeight:0.9,color:"var(--text)",marginBottom:4,textShadow:"0 4px 30px rgba(0,0,0,0.5)"}}>
+          IMPOSTER
+        </h1>
+        <h1 className="fade-up-2 display" style={{fontSize:"clamp(62px,18vw,96px)",letterSpacing:"0.04em",lineHeight:0.9,color:"var(--coral)",marginBottom:16,textShadow:"0 0 60px rgba(255,95,63,0.4)"}}>
+          BEAT
+        </h1>
+        <p className="fade-up-3" style={{color:"var(--sub)",fontSize:15,fontWeight:500,marginBottom:36,lineHeight:1.5}}>
+          Music · Deception · Drama<br/>
+          <span style={{fontSize:13}}>Everyone's phone. One secret song.</span>
+        </p>
+
+        <div className="fade-up-4" style={{display:"flex",flexDirection:"column",gap:10,maxWidth:300,margin:"0 auto"}}>
+          <button className="btn btn-primary" onClick={()=>{SFX.whoosh();setScreen("create");}}>
+            🏠 Create Room
+          </button>
+          <button className="btn btn-teal" onClick={()=>{SFX.whoosh();setScreen("join");}}>
+            🔑 Join Room
+          </button>
+          <button className="btn btn-ghost" onClick={()=>setScreen("guide")}>
+            📖 How to Play
+          </button>
+        </div>
+
+        <div className="fade-up-5" style={{display:"flex",justifyContent:"center",gap:28,marginTop:32,color:"var(--sub)",fontSize:12}}>
+          {[["🕵️","Deduce"],["🎤","Perform"],["🤖","AI Judge"]].map(([e,t])=>(
+            <div key={t} style={{textAlign:"center"}}>
+              <div style={{fontSize:22,marginBottom:4}}>{e}</div>
+              <div style={{fontWeight:600}}>{t}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── CREATE ────────────────────────────────────────────────────────────
+  if (screen === "create") return (
+    <div className="atm-default page">
+      <div className="container fade-up">
+        <BackBtn onClick={()=>{setError("");clearHash();setScreen("home");}}/>
+        <h2 className="display" style={{fontSize:40,marginBottom:6,color:"var(--text)"}}>CREATE ROOM</h2>
+        <p style={{color:"var(--sub)",fontSize:13,marginBottom:24}}>You'll host. Friends join with your code.</p>
+        <FirebaseSetupGuide error={fbErr}/>
+        <div className="card" style={{marginBottom:12}}>
+          <div style={{color:"var(--sub)",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:8}}>Your name</div>
+          <input className="input" value={nameInput} onChange={e=>setNameInput(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&createRoom()} placeholder="Enter your name..." autoFocus/>
+        </div>
+        {error && <div style={{color:"#f87171",fontSize:14,fontWeight:600,marginBottom:12,padding:"10px 14px",background:"rgba(239,68,68,0.1)",borderRadius:12,border:"1px solid rgba(239,68,68,0.3)"}}>❌ {error}</div>}
+        <button className="btn btn-primary" onClick={createRoom} disabled={loading || !nameInput.trim()}>
+          {loading ? "Creating room..." : "Create Room 🚀"}
+        </button>
+      </div>
+    </div>
+  );
+
+  // ── JOIN ──────────────────────────────────────────────────────────────
+  if (screen === "join") return (
+    <div className="atm-default page">
+      <div className="container fade-up">
+        <BackBtn onClick={()=>{setError("");clearHash();setScreen("home");}}/>
+        <h2 className="display" style={{fontSize:40,marginBottom:6,color:"var(--text)"}}>JOIN ROOM</h2>
+        <p style={{color:"var(--sub)",fontSize:13,marginBottom:24}}>Get the 4-letter code from the host.</p>
+        <FirebaseSetupGuide error={fbErr}/>
+        <div className="card" style={{marginBottom:10}}>
+          <div style={{color:"var(--sub)",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:8}}>Room Code</div>
+          <input className="input input-code" value={codeInput} onChange={e=>setCodeInput(e.target.value.toUpperCase())}
+            onKeyDown={e=>e.key==="Enter"&&joinRoom()} placeholder="XXXX" maxLength={4} autoFocus/>
+        </div>
+        <div className="card" style={{marginBottom:14}}>
+          <div style={{color:"var(--sub)",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:8}}>Your name</div>
+          <input className="input" value={nameInput} onChange={e=>setNameInput(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&joinRoom()} placeholder="Enter your name..."/>
+        </div>
+        {error && <div style={{color:"#f87171",fontSize:14,fontWeight:600,marginBottom:12,padding:"10px 14px",background:"rgba(239,68,68,0.1)",borderRadius:12,border:"1px solid rgba(239,68,68,0.3)"}}>❌ {error}</div>}
+        <button className="btn btn-teal" onClick={joinRoom} disabled={loading || !nameInput.trim() || !codeInput.trim()}>
+          {loading ? "Joining..." : "Join Game 🎮"}
+        </button>
+      </div>
+    </div>
+  );
+
+  // ── GUIDE ─────────────────────────────────────────────────────────────
+  if (screen === "guide") return (
+    <div className="atm-default page-top">
+      <div className="container fade-up">
+        <BackBtn onClick={()=>setScreen("home")}/>
+        <h2 className="display" style={{fontSize:44,marginBottom:20,color:"var(--text)"}}>HOW TO PLAY</h2>
+        {[
+          ["🏠","Create or Join","Host creates a room and shares the 4-letter code. Everyone opens this page on their own phone and joins."],
+          ["🤫","Secret Roles","Your role appears ONLY on your own phone. Investigators see the secret song. Imposters see nothing."],
+          ["🎯","3 Hint Rounds","ARTIST → GENRE → YEAR. Each player draws a random challenge card and must give their hint using its constraint."],
+          ["🤖","AI Judge","After hints, get a Claude-powered dramatic verdict casting suspicion on players based on their hints."],
+          ["🗳️","Vote","Everyone votes secretly on their own phone. Most-voted players are revealed dramatically, one at a time."],
+          ["🎭","Imposter Guesses","Imposters secretly guess which of 100 songs it was. Score points for guessing correctly."],
+          ["🎤","The Solo","Every imposter MUST stand up and sing their guessed song. Terrible singing = more points for entertainment."],
+          ["🏆","Scoring","Investigators: +10/caught imposter, +20 bonus if all caught. Imposters: +15 surviving, +25 correct guess."],
+        ].map(([e,t,d], i) => (
+          <div key={t} className="card" style={{display:"flex",gap:14,marginBottom:10,animation:`fadeUp 0.35s ${i*0.04}s both`}}>
+            <div style={{fontSize:26,flexShrink:0}}>{e}</div>
+            <div>
+              <div style={{color:"var(--text)",fontWeight:800,marginBottom:3,fontSize:15}}>{t}</div>
+              <div style={{color:"var(--sub)",fontSize:13,lineHeight:1.55}}>{d}</div>
+            </div>
+          </div>
+        ))}
+        <button className="btn btn-primary" style={{marginTop:10}} onClick={()=>setScreen("home")}>
+          Let's Play! 🎮
+        </button>
+      </div>
+    </div>
+  );
+
+  // ── LOBBY ─────────────────────────────────────────────────────────────
+  if (screen === "lobby" && room) {
+    const shareUrl = window.location.origin + window.location.pathname + `#join/${roomCode}`;
+    return (
+      <div className="atm-default page-top">
+        <div className="container fade-up">
+          <div style={{textAlign:"center",marginBottom:28}}>
+            <div style={{fontSize:11,color:"var(--sub)",fontWeight:700,letterSpacing:3,textTransform:"uppercase",marginBottom:10}}>Room Code</div>
+            <div className="display" style={{fontSize:90,letterSpacing:16,color:"var(--coral)",textShadow:"0 0 60px rgba(255,95,63,0.5)",lineHeight:1}}>
+              {roomCode}
+            </div>
+            <p style={{color:"var(--sub)",fontSize:13,marginTop:8,marginBottom:14}}>Share with friends — everyone uses their own phone</p>
+            {/* Agent upgrade: URL share button */}
+            <button className="btn btn-ghost btn-sm" style={{margin:"0 auto"}} onClick={()=>{
+              navigator.clipboard?.writeText(shareUrl).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);});
+            }}>
+              {copied ? "✓ Copied!" : "📋 Copy Join Link"}
+            </button>
+          </div>
+
+          <FirebaseSetupGuide error={fbErr}/>
+
+          {/* Players */}
+          <div className="card" style={{marginBottom:14}}>
+            <div style={{color:"var(--sub)",fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,marginBottom:14}}>
+              Players ({players.length})
+            </div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:14,justifyContent:"flex-start"}}>
+              {players.map(p => <Avatar key={p} name={p} players={players} size={52} showName isHost={p===room.host}/>)}
+            </div>
+            {players.length < 3 && <div style={{color:"#fbbf24",fontSize:13,fontWeight:600,marginTop:12}}>⚠️ Need at least 3 players to start</div>}
+          </div>
+
+          {/* Host settings */}
+          {isHost && (
+            <div className="card" style={{marginBottom:14}}>
+              <div style={{color:"var(--sub)",fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,marginBottom:12}}>
+                Imposters
+              </div>
+              <div style={{display:"flex",gap:8}}>
+                {[1,2,3].map(n => (
+                  <button key={n} onClick={()=>withFbError(()=>db.patch(`/rooms/${roomCode}`,{impostersCount:n}))}
+                    style={{flex:1,padding:"14px 0",borderRadius:14,fontWeight:900,fontSize:24,border:"2px solid",cursor:"pointer",
+                      fontFamily:"var(--font-d)",letterSpacing:"0.05em",
+                      background:(room.impostersCount||1)===n?"var(--coral)":"rgba(255,255,255,0.05)",
+                      borderColor:(room.impostersCount||1)===n?"var(--coral)":"var(--border)",
+                      color:(room.impostersCount||1)===n?"#fff":"var(--sub)",
+                      boxShadow:(room.impostersCount||1)===n?"0 4px 20px rgba(255,95,63,0.4)":"none"}}>
+                    {n}
+                  </button>
+                ))}
+              </div>
+              {error && <p style={{color:"#f87171",fontSize:13,marginTop:10}}>❌ {error}</p>}
+              <button className="btn btn-primary" style={{marginTop:14}} onClick={startGame} disabled={players.length<3}>
+                🚀 Start Game!
+              </button>
+            </div>
+          )}
+          {!isHost && <div style={{textAlign:"center",color:"var(--sub)",padding:"20px 0",fontSize:15,fontWeight:600}}>⏳ Waiting for host to start...</div>}
+        </div>
+      </div>
+    );
+  }
+
+  if (!room?.phase) return (
+    <div className="atm-default" style={{minHeight:"100dvh",display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div style={{fontSize:40,animation:"spin 1s linear infinite"}}>⏳</div>
+    </div>
+  );
+
+  const phase = room.phase;
+
+  // ── ROLE REVEAL ───────────────────────────────────────────────────────
+  if (phase === "role_reveal") {
+    const readyCount = Object.keys(room.ready||{}).length;
+    const allReady = readyCount >= players.length;
+    const isImp = room.roles?.[myName] === "imposter";
+    return (
+      <div style={{minHeight:"100dvh",display:"flex",alignItems:"center",justifyContent:"center",padding:24,
+        background: isImp
+          ? "radial-gradient(ellipse 80% 80% at 50% 0%, rgba(168,85,247,0.25), transparent), var(--bg)"
+          : "radial-gradient(ellipse 80% 80% at 50% 0%, rgba(0,201,167,0.15), transparent), var(--bg)"}}>
+        <div className="container" style={{textAlign:"center"}}>
+          {!hasReadyRole ? (
+            <>
+              {!roleVisible ? (
+                <div className="fade-up">
+                  <div style={{fontSize:64,marginBottom:16,filter:"drop-shadow(0 0 30px rgba(244,197,66,0.5))"}}>🥁</div>
+                  <div className="display" style={{fontSize:48,color:"var(--gold)",marginBottom:8}}>YOUR ROLE</div>
+                  <p style={{color:"var(--sub)",marginBottom:28,fontSize:14}}>Make sure no one else can see your screen</p>
+                  <button className="btn btn-gold" style={{maxWidth:260,margin:"0 auto"}}
+                    onClick={()=>{SFX.suspense();setRoleVisible(true);}}>
+                    👁️ Reveal My Role
+                  </button>
+                </div>
+              ) : (
+                <div className="scale-in">
+                  <div style={{
+                    borderRadius:28,padding:"32px 24px",marginBottom:20,
+                    background: isImp ? "rgba(168,85,247,0.1)" : "rgba(0,201,167,0.08)",
+                    border: `2px solid ${isImp?"rgba(168,85,247,0.5)":"rgba(0,201,167,0.4)"}`,
+                    boxShadow: isImp ? "0 0 60px rgba(168,85,247,0.25)" : "0 0 60px rgba(0,201,167,0.15)",
+                  }}>
+                    <div style={{fontSize:70,marginBottom:10,animation:"pulse 2s ease-in-out infinite"}}>{isImp?"🎭":"🕵️"}</div>
+                    <div className="display" style={{fontSize:56,letterSpacing:"0.05em",marginBottom:8,
+                      color:isImp?"var(--purple)":"var(--teal)"}}>
+                      {isImp ? "IMPOSTER" : "INVESTIGATOR"}
+                    </div>
+                    {!isImp && song && <>
+                      <p style={{color:"rgba(255,255,255,0.5)",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,marginBottom:6}}>The Secret Song</p>
+                      <div className="display" style={{fontSize:30,color:"var(--text)",marginBottom:4}}>{song.title}</div>
+                      <p style={{color:"var(--teal)",fontSize:16,fontWeight:600,marginBottom:12}}>{song.artist}</p>
+                      <div style={{display:"flex",justifyContent:"center",gap:16}}>
+                        <span style={{background:"rgba(0,201,167,0.15)",color:"var(--teal)",padding:"5px 12px",borderRadius:20,fontSize:12,fontWeight:700}}>🎸 {song.genre}</span>
+                        <span style={{background:"rgba(0,201,167,0.15)",color:"var(--teal)",padding:"5px 12px",borderRadius:20,fontSize:12,fontWeight:700}}>📅 {song.year}</span>
+                      </div>
+                    </>}
+                    {isImp && <>
+                      <p style={{color:"rgba(255,255,255,0.6)",marginBottom:6,fontSize:14}}>You do NOT know the song.</p>
+                      <p style={{color:"rgba(255,255,255,0.5)",fontSize:13}}>Watch every hint. Blend in. Survive the vote.</p>
+                      <p style={{color:"#f87171",fontWeight:700,marginTop:12,fontSize:13}}>⚠️ Don't get caught!</p>
+                    </>}
+                  </div>
+                  <button className="btn btn-primary" onClick={()=>{SFX.correct();setHasReadyRole(true);withFbError(()=>db.patch(`/rooms/${roomCode}`,{ready:{[myName]:true}}));}}>
+                    Got it! 👍
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="fade-up">
+              <div style={{fontSize:54,marginBottom:12}}>✅</div>
+              <div className="display" style={{fontSize:40,color:"var(--teal)",marginBottom:8}}>READY!</div>
+              <p style={{color:"var(--sub)",fontSize:14,marginBottom:20}}>Waiting for everyone...</p>
+              <div className="card" style={{marginBottom:20}}>
+                <div style={{color:"var(--sub)",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:12}}>
+                  {readyCount}/{players.length} Ready
+                </div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:8,justifyContent:"center"}}>
+                  {players.map(p => (
+                    <div key={p} style={{display:"flex",alignItems:"center",gap:6,padding:"5px 12px",borderRadius:20,
+                      background:room.ready?.[p]?"rgba(0,201,167,0.12)":"rgba(255,255,255,0.04)",
+                      border:`1px solid ${room.ready?.[p]?"rgba(0,201,167,0.3)":"var(--border)"}`,
+                      color:room.ready?.[p]?"var(--teal)":"var(--sub)",fontSize:13,fontWeight:600}}>
+                      {room.ready?.[p]&&<span style={{fontSize:10}}>✓</span>}{p}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {isHost && allReady && (
+                <button className="btn btn-primary" onClick={()=>{SFX.whoosh();withFbError(()=>db.patch(`/rooms/${roomCode}`,{phase:"cat_reveal"}));}}>
+                  Everyone's Ready — GO! 🎯
+                </button>
+              )}
+              {isHost && !allReady && <p style={{color:"var(--sub)",fontSize:13}}>Wait for all players to tap "Got it"</p>}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── CAT REVEAL ────────────────────────────────────────────────────────
+  if (phase === "cat_reveal") return (
+    <div className="atm-hints" style={{minHeight:"100dvh",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+      <div className="container" style={{textAlign:"center"}}>
+        <div className="fade-up">
+          <div style={{fontSize:52,marginBottom:12}}>🎯</div>
+          <div className="display" style={{fontSize:48,marginBottom:6,color:"var(--text)"}}>LET'S BEGIN</div>
+          <p style={{color:"var(--sub)",fontSize:14,marginBottom:24,lineHeight:1.6}}>
+            3 rounds of hints. One category per round.<br/>
+            <strong style={{color:"var(--text)"}}>Watch the imposters squirm.</strong>
+          </p>
+          <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:24}}>
+            {[["🎤","Round 1","ARTIST"],["🎸","Round 2","GENRE"],["📅","Round 3","YEAR"]].map(([icon,r,cat],i) => (
+              <div key={cat} className="card" style={{display:"flex",alignItems:"center",gap:14,animation:`fadeUp 0.35s ${i*0.08}s both`}}>
+                <span style={{fontSize:26}}>{icon}</span>
+                <div style={{textAlign:"left"}}>
+                  <div style={{color:"var(--sub)",fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:1.5}}>{r}</div>
+                  <div className="display" style={{fontSize:24,letterSpacing:"0.04em",color:"var(--text)"}}>{cat}</div>
+                </div>
+                <div style={{marginLeft:"auto",background:"rgba(255,255,255,0.05)",borderRadius:20,padding:"4px 10px",fontSize:11,color:"var(--sub)",fontWeight:700}}>Hint</div>
+              </div>
+            ))}
+          </div>
+          {isHost
+            ? <button className="btn btn-primary" onClick={()=>{SFX.whoosh();withFbError(()=>db.patch(`/rooms/${roomCode}`,{phase:"hints",round:0,currentPlayer:0}));}}>Start Round 1 🎮</button>
+            : <div style={{color:"var(--sub)",fontSize:15,fontWeight:600,padding:"16px 0"}}>⏳ Waiting for host...</div>}
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── HINTS ─────────────────────────────────────────────────────────────
+  if (phase === "hints") {
+    const cp = room.currentPlayer || 0;
+    const curPlayer = players[cp];
+    const isMyTurn = curPlayer === myName;
+    const card = room.hints?.[room.round]?.[cp];
+    const iAmImposter = room.roles?.[myName] === "imposter";
+
+    async function nextHint() {
+      if (myHintText.trim() && isMyTurn) {
+        await withFbError(() => db.patch(`/rooms/${roomCode}`,{hintLog:{[room.round||0]:{[curPlayer]:myHintText.trim()}}}));
+        setMyHintText("");
+      }
+      SFX.whoosh();
+      if (cp < players.length-1) {
+        await withFbError(() => db.patch(`/rooms/${roomCode}`,{currentPlayer:cp+1}));
+      } else if ((room.round||0) < 2) {
+        await withFbError(() => db.patch(`/rooms/${roomCode}`,{phase:"between",betweenMsg:rand(BETWEEN_MSGS)}));
+      } else {
+        await withFbError(() => db.patch(`/rooms/${roomCode}`,{phase:"speeches",speechIdx:0}));
+        setTimer(30); setTimerOn(true);
+      }
+    }
+
+    return (
+      <div className="atm-hints" style={{minHeight:"100dvh",padding:"20px 20px 32px"}}>
+        {music.ytSong && <YouTubeModal title={music.ytSong.title} artist={music.ytSong.artist} onClose={music.stop}/>}
+        <div className="container" style={{textAlign:"center"}}>
+          {/* Progress indicator */}
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+            <div style={{display:"flex",gap:6}}>
+              {[0,1,2].map(r => (
+                <div key={r} style={{height:4,width:40,borderRadius:2,background:(room.round||0)>=r?"var(--teal)":"var(--border)",transition:"background 0.3s"}}/>
+              ))}
+            </div>
+            <span style={{color:"var(--sub)",fontSize:12,fontWeight:700}}>{cp+1} of {players.length}</span>
+          </div>
+
+          <div style={{marginBottom:12}}>
+            <div style={{color:"var(--sub)",fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:2,marginBottom:6}}>
+              Round {(room.round||0)+1} — {CATS[room.round||0]}
+            </div>
+            <div style={{display:"flex",justifyContent:"center",marginBottom:8}}>
+              <Avatar name={curPlayer} players={players} size={64}/>
+            </div>
+            <div className="display" style={{fontSize:46,color: isMyTurn?"var(--coral)":"var(--text)",marginBottom:isMyTurn?4:0}}>
+              {isMyTurn ? "YOUR TURN" : curPlayer}
+            </div>
+            {!isMyTurn && <div style={{color:"var(--sub)",fontSize:13,fontWeight:600}}>{curPlayer} is giving a hint</div>}
+          </div>
+
+          {/* Challenge card */}
+          {card && <div className="fade-up" style={{marginBottom:14}}>
+            <ChallengeCardDisplay card={card}/>
+          </div>}
+
+          {/* Hint context */}
+          <div className="card" style={{marginBottom:14,textAlign:"left"}}>
+            <div style={{color:"var(--sub)",fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,marginBottom:8}}>
+              Hint about the {CATS[room.round||0]}
+            </div>
+            {isMyTurn && !iAmImposter && (
+              <div style={{background:"rgba(0,201,167,0.1)",border:"1px solid rgba(0,201,167,0.3)",borderRadius:12,padding:"10px 14px",marginBottom:10}}>
+                <div style={{color:"rgba(255,255,255,0.5)",fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>The answer</div>
+                <div className="display" style={{fontSize:24,color:"var(--teal)"}}>{song?.[catKeys[room.round||0]]}</div>
+              </div>
+            )}
+            {isMyTurn && iAmImposter && (
+              <div style={{background:"rgba(168,85,247,0.1)",border:"1px solid rgba(168,85,247,0.3)",borderRadius:12,padding:"10px 14px",marginBottom:10}}>
+                <div className="display" style={{fontSize:20,color:"var(--purple)"}}>🎭 YOU'RE THE IMPOSTER</div>
+                <div style={{color:"rgba(255,255,255,0.5)",fontSize:13,marginTop:4}}>Blend in. Watch others. Bluff with confidence.</div>
+              </div>
+            )}
+            {isMyTurn && (
+              <input className="input" value={myHintText} onChange={e=>setMyHintText(e.target.value)}
+                placeholder="Type hint for AI Judge log (optional)..."
+                style={{marginBottom:0}}/>
+            )}
+            {!isMyTurn && <p style={{color:"var(--sub)",fontSize:14,fontWeight:600,margin:0}}>
+              {iAmImposter ? "🎭 You're the imposter — listen carefully!" : `👂 Listen to ${curPlayer}'s hint`}
+            </p>}
+          </div>
+
+          {/* AI Judge after round 1 */}
+          {(room.round||0) > 0 && isHost && <AIJudge room={room} players={players}/>}
+
+          {isHost
+            ? <button className="btn btn-primary" onClick={nextHint}>
+                {cp < players.length-1 ? "Next Player →" : (room.round||0)<2 ? "Next Round 🎯" : "Start Speeches 🎙️"}
+              </button>
+            : <div style={{textAlign:"center",color:"var(--sub)",fontSize:14,padding:"12px 0",fontWeight:600}}>Host advances turns</div>}
+        </div>
+      </div>
+    );
+  }
+
+  // ── BETWEEN ───────────────────────────────────────────────────────────
+  if (phase === "between") return (
+    <div className="atm-default" style={{minHeight:"100dvh",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+      <div className="container" style={{textAlign:"center"}}>
+        <div className="scale-in">
+          <div style={{fontSize:64,marginBottom:16}}>🎶</div>
+          <div className="display" style={{fontSize:48,color:"var(--gold)",marginBottom:16}}>MUSIC BREAK!</div>
+          <div className="card" style={{marginBottom:20,borderColor:"rgba(244,197,66,0.3)",background:"rgba(244,197,66,0.06)"}}>
+            <p style={{color:"var(--gold)",fontSize:16,fontWeight:700,margin:0,lineHeight:1.6}}>{room.betweenMsg}</p>
+          </div>
+          <p style={{color:"var(--sub)",fontSize:13,marginBottom:20}}>
+            Next: <strong style={{color:"var(--text)"}}>{CATS[(room.round||0)+1]} Round</strong>
+          </p>
+          {isHost
+            ? <button className="btn btn-primary" onClick={()=>{SFX.whoosh();withFbError(()=>db.patch(`/rooms/${roomCode}`,{phase:"hints",round:(room.round||0)+1,currentPlayer:0}));}}>Continue →</button>
+            : <p style={{color:"var(--sub)",fontSize:14,fontWeight:600}}>⏳ Host advances...</p>}
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── SPEECHES ──────────────────────────────────────────────────────────
+  if (phase === "speeches") {
+    const sp = room.speechIdx || 0;
+    const sp_player = players[sp];
+    const isMe = sp_player === myName;
+    async function nextSpeech() {
+      setTimerOn(false);
+      SFX.whoosh();
+      if (sp < players.length-1) {
+        await withFbError(() => db.patch(`/rooms/${roomCode}`,{speechIdx:sp+1}));
+        setTimer(30); setTimerOn(true);
+      } else {
+        await withFbError(() => db.patch(`/rooms/${roomCode}`,{phase:"voting",votes:{}}));
+      }
+    }
+    return (
+      <div className="atm-default" style={{minHeight:"100dvh",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+        <div className="container fade-up" style={{textAlign:"center"}}>
+          <div style={{fontSize:11,color:"var(--sub)",fontWeight:700,textTransform:"uppercase",letterSpacing:2,marginBottom:10}}>
+            Defense Speech {sp+1}/{players.length}
+          </div>
+          <div style={{marginBottom:16}}>
+            <Avatar name={sp_player} players={players} size={72}/>
+          </div>
+          <div className="display" style={{fontSize:52,color:isMe?"var(--coral)":"var(--text)",marginBottom:8}}>
+            {isMe ? "THAT'S YOU!" : sp_player}
+          </div>
+          {isMe
+            ? <p style={{color:"var(--coral)",fontSize:15,fontWeight:700,marginBottom:20}}>🎤 Convince the room you're innocent.</p>
+            : <p style={{color:"var(--sub)",fontSize:14,marginBottom:20}}>Listen carefully for inconsistencies...</p>}
+
+          {isHost && <div style={{marginBottom:20}}><CircularTimer s={timer} total={30}/></div>}
+
+          {isHost && (
+            <>
+              <AIJudge room={room} players={players}/>
+              <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                {!timerOn && timer === 30 && (
+                  <button className="btn btn-teal" onClick={()=>{setTimer(30);setTimerOn(true);SFX.whoosh();}}>▶️ Start Timer</button>
+                )}
+                {!timerOn && timer < 30 && timer > 0 && (
+                  <button className="btn btn-ghost" onClick={()=>setTimerOn(true)}>⏸ Resume</button>
+                )}
+                <button className="btn btn-primary" onClick={nextSpeech}>
+                  {sp<players.length-1?"Next Speaker →":"Start Voting 🗳️"}
+                </button>
+              </div>
+            </>
+          )}
+          {!isHost && <div style={{color:"var(--sub)",fontSize:14,fontWeight:600,padding:"10px 0"}}>⏳ Host controls the timer</div>}
+        </div>
+      </div>
+    );
+  }
+
+  // ── VOTING ────────────────────────────────────────────────────────────
+  if (phase === "voting") {
+    const voteCount = Object.keys(room.votes||{}).length;
+    async function castVote() {
+      if (!myVote) return;
+      SFX.whoosh();
+      const newVotes = {...(room.votes||{}), [myName]:myVote};
+      await withFbError(() => db.patch(`/rooms/${roomCode}`,{votes:{[myName]:myVote}}));
+      setHasVoted(true);
+      if (Object.keys(newVotes).length >= players.length) {
+        await withFbError(() => db.patch(`/rooms/${roomCode}`,{phase:"imposter_guess",guesses:{}}));
+      }
+    }
+    return (
+      <div className="atm-vote" style={{minHeight:"100dvh",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+        <div className="container">
+          {!hasVoted ? (
+            <div className="fade-up">
+              <div style={{textAlign:"center",marginBottom:20}}>
+                <div style={{fontSize:50,marginBottom:10,animation:"pulse 1.5s ease-in-out infinite"}}>🗳️</div>
+                <div className="display" style={{fontSize:44,color:"#f87171",marginBottom:6}}>CAST YOUR VOTE</div>
+                <p style={{color:"var(--sub)",fontSize:13}}>Vote on your own phone. Keep it secret.</p>
+              </div>
+              <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
+                {players.filter(p=>p!==myName).map(p => (
+                  <button key={p} onClick={()=>{SFX.tick();setMyVote(p);}}
+                    style={{padding:"14px 18px",borderRadius:16,fontWeight:700,fontSize:16,border:"2px solid",cursor:"pointer",textAlign:"left",
+                      display:"flex",alignItems:"center",gap:12,
+                      background:myVote===p?"rgba(239,68,68,0.15)":"rgba(255,255,255,0.04)",
+                      borderColor:myVote===p?"#ef4444":"var(--border)",
+                      color:myVote===p?"#f87171":"var(--text)",
+                      boxShadow:myVote===p?"0 0 20px rgba(239,68,68,0.3)":"none",
+                      transform:myVote===p?"scale(1.02)":"scale(1)",transition:"all 0.15s"}}>
+                    <Avatar name={p} players={players} size={36}/>
+                    {p}
+                    {myVote===p && <span style={{marginLeft:"auto",fontSize:18}}>🎯</span>}
+                  </button>
+                ))}
+              </div>
+              <button className="btn btn-danger" onClick={castVote} disabled={!myVote}>
+                Cast Vote 🗳️
+              </button>
+            </div>
+          ) : (
+            <div className="fade-up" style={{textAlign:"center"}}>
+              <div style={{fontSize:56,marginBottom:12}}>✅</div>
+              <div className="display" style={{fontSize:44,color:"var(--teal)",marginBottom:8}}>VOTE CAST!</div>
+              <p style={{color:"var(--sub)",fontSize:14,marginBottom:24}}>Waiting for the others...</p>
+              {/* Agent upgrade: vote progress dots */}
+              <div className="card">
+                <div style={{color:"var(--sub)",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,marginBottom:14}}>
+                  Votes In: {voteCount}/{players.length}
+                </div>
+                <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
+                  {players.map((p,i) => (
+                    <div key={p} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+                      <div className={`vote-dot${Object.keys(room.votes||{}).length>i?" voted":""}`}
+                        style={{animation:Object.keys(room.votes||{}).length>i?"pulse 0.5s ease":"none"}}/>
+                      <div style={{fontSize:10,color:"var(--dim)",fontWeight:600,maxWidth:40,textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── IMPOSTER GUESS ────────────────────────────────────────────────────
+  if (phase === "imposter_guess") {
+    const isImposter = room.roles?.[myName] === "imposter";
+    const guessCount = Object.keys(room.guesses||{}).length;
+    if (!isImposter) return (
+      <div className="atm-vote" style={{minHeight:"100dvh",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+        <div className="fade-up" style={{textAlign:"center"}}>
+          <div style={{fontSize:54,marginBottom:12,animation:"pulse 1.5s ease-in-out infinite"}}>🔍</div>
+          <div className="display" style={{fontSize:44,color:"var(--text)",marginBottom:8}}>IMPOSTER GUESSING</div>
+          <p style={{color:"var(--sub)",fontSize:14,marginBottom:20}}>The imposters are trying to guess the song...</p>
+          <div style={{display:"flex",gap:8,justifyContent:"center"}}>
+            {imposters.map(imp => (
+              <div key={imp} style={{padding:"6px 14px",borderRadius:20,fontSize:13,fontWeight:700,
+                background:room.guesses?.[imp]?"rgba(0,201,167,0.1)":"rgba(255,255,255,0.05)",
+                border:`1px solid ${room.guesses?.[imp]?"rgba(0,201,167,0.3)":"var(--border)"}`,
+                color:room.guesses?.[imp]?"var(--teal)":"var(--sub)"}}>
+                {room.guesses?.[imp]?"✓ ":""}{imp}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+    async function submitGuess() {
+      if (!myGuess) return;
+      SFX.whoosh();
+      const newGuesses = {...(room.guesses||{}), [myName]:myGuess};
+      await withFbError(() => db.patch(`/rooms/${roomCode}`,{guesses:{[myName]:myGuess}}));
+      setHasGuessed(true);
+      if (Object.keys(newGuesses).length >= imposters.length) {
+        await withFbError(() => db.patch(`/rooms/${roomCode}`,{phase:"reveal",revealed:{}}));
+      }
+    }
+    const filteredSongs = SONGS.filter(s =>
+      s.title.toLowerCase().includes(search.toLowerCase()) ||
+      s.artist.toLowerCase().includes(search.toLowerCase()) ||
+      s.year.toString().includes(search)
+    );
+    return (
+      <div className="atm-vote" style={{minHeight:"100dvh",padding:"20px 20px 32px"}}>
+        {music.ytSong && <YouTubeModal title={music.ytSong.title} artist={music.ytSong.artist} onClose={music.stop}/>}
+        <div className="container">
+          <div className="fade-up" style={{textAlign:"center",marginBottom:16}}>
+            <div style={{fontSize:46,marginBottom:8}}>🎭</div>
+            <div className="display" style={{fontSize:40,color:"var(--purple)"}}>YOUR FINAL GUESS</div>
+            <p style={{color:"var(--sub)",fontSize:13,marginTop:4}}>What was the secret song? You've seen all the clues.</p>
+          </div>
+          {!hasGuessed ? (<>
+            <input className="input" value={search} onChange={e=>{setSearch(e.target.value);setMyGuess(null);}}
+              placeholder="Search 100 songs..." autoFocus style={{marginBottom:10}}/>
+            {myGuess && (
+              <div style={{background:"rgba(168,85,247,0.1)",border:"1px solid rgba(168,85,247,0.4)",borderRadius:16,padding:12,marginBottom:10,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <div style={{color:"var(--text)",fontWeight:700}}>{myGuess.title}</div>
+                  <div style={{color:"var(--purple)",fontSize:13}}>{myGuess.artist} · {myGuess.year}</div>
+                </div>
+                <PlayBtn title={myGuess.title} artist={myGuess.artist} music={music} label="▶" color="var(--purple)"/>
+              </div>
+            )}
+            <div style={{maxHeight:230,overflowY:"auto",display:"flex",flexDirection:"column",gap:6,marginBottom:14}}>
+              {filteredSongs.slice(0,30).map(s => (
+                <button key={s.id} onClick={()=>{SFX.tick();setMyGuess(s);}}
+                  style={{textAlign:"left",padding:"11px 14px",borderRadius:12,border:"1.5px solid",cursor:"pointer",
+                    background:myGuess?.id===s.id?"rgba(168,85,247,0.12)":"rgba(255,255,255,0.03)",
+                    borderColor:myGuess?.id===s.id?"var(--purple)":"var(--border)",
+                    color:myGuess?.id===s.id?"var(--text)":"var(--sub)"}}>
+                  <div style={{fontWeight:700,fontSize:14,color:"var(--text)"}}>{s.title}</div>
+                  <div style={{fontSize:12,marginTop:1}}>{s.artist} · {s.year} · {s.genre}</div>
+                </button>
+              ))}
+            </div>
+            <button className="btn btn-purple" onClick={submitGuess} disabled={!myGuess}>Lock In Guess 🔒</button>
+          </>) : (
+            <div className="fade-up" style={{textAlign:"center",marginTop:20}}>
+              <div style={{fontSize:54,marginBottom:10}}>✅</div>
+              <div className="display" style={{fontSize:36,color:"var(--teal)"}}>GUESS LOCKED</div>
+              <p style={{color:"var(--sub)",fontSize:14,marginTop:8}}>Waiting for other imposters...</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── REVEAL ────────────────────────────────────────────────────────────
+  if (phase === "reveal") {
+    const top = getTopVoted();
+    const allDone = Object.keys(room.revealed||{}).length >= top.length;
+    return (
+      <div className="atm-reveal" style={{minHeight:"100dvh",padding:"24px 20px 32px"}}>
+        <Confetti active={confetti}/>
+        {music.ytSong && <YouTubeModal title={music.ytSong.title} artist={music.ytSong.artist} onClose={music.stop}/>}
+        <div className="container">
+          <div className="fade-up" style={{textAlign:"center",marginBottom:20}}>
+            <div className="display" style={{fontSize:52,color:"#f87171"}}>THE RESULTS</div>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:16}}>
+            {top.map((p,i) => {
+              const isImp = room.roles[p] === "imposter";
+              const isRev = room.revealed?.[p];
+              return (
+                <div key={p} style={{borderRadius:24,padding:18,border:`2px solid`,transition:"all 0.5s",
+                  borderColor:isRev?(isImp?"rgba(239,68,68,0.6)":"rgba(0,201,167,0.5)"):"var(--border)",
+                  background:isRev?(isImp?"rgba(239,68,68,0.07)":"rgba(0,201,167,0.05)"):"var(--s2)",
+                  boxShadow:isRev&&isImp?"0 0 40px rgba(239,68,68,0.25)":"none"}}>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:12}}>
+                      <Avatar name={p} players={players} size={48}/>
+                      <div>
+                        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3}}>
+                          <span style={{color:"var(--sub)",fontSize:16}}>{"🥇🥈🥉"[i]||"🎖️"}</span>
+                          <span style={{fontWeight:800,fontSize:18,color:"var(--text)"}}>{p}</span>
+                        </div>
+                        {isRev && <div className="display" style={{fontSize:22,color:isImp?"#f87171":"var(--teal)"}}>
+                          {isImp ? "🎭 IMPOSTER!" : "🕵️ Innocent"}
+                        </div>}
+                      </div>
+                    </div>
+                    {!isRev && isHost && (
+                      <button className="drum-btn" onClick={()=>{
+                        SFX.drumHit(1.5);
+                        setTimeout(()=>{
+                          SFX.reveal();
+                          withFbError(()=>db.patch(`/rooms/${roomCode}`,{revealed:{[p]:true}}));
+                          if (room.roles[p]==="imposter") {
+                            setTimeout(()=>{setConfetti(true);setTimeout(()=>setConfetti(false),4000);},300);
+                            SFX.victory();
+                          }
+                        },600);
+                      }}>
+                        🥁
+                      </button>
+                    )}
+                    {!isRev && !isHost && <div style={{color:"var(--sub)",fontSize:13,fontWeight:600}}>⏳</div>}
+                  </div>
+                  {isRev && isImp && room.guesses?.[p] && (
+                    <div style={{marginTop:12,padding:"10px 14px",background:"rgba(0,0,0,0.3)",borderRadius:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                      <div>
+                        <div style={{color:"var(--sub)",fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:1}}>Their guess</div>
+                        <div style={{color:"#fca5a5",fontWeight:700}}>{room.guesses[p].title}</div>
+                      </div>
+                      <PlayBtn title={room.guesses[p].title} artist={room.guesses[p].artist} music={music} label="▶" color="#dc2626"/>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          {!allDone && <p style={{color:"var(--gold)",fontSize:14,fontWeight:600,textAlign:"center",marginBottom:16}}>🥁 Host — hit the drum to reveal each player!</p>}
+          {allDone && (
+            <div className="scale-in">
+              <div className="card" style={{textAlign:"center",marginBottom:14,borderColor:"rgba(244,197,66,0.3)",background:"rgba(244,197,66,0.06)"}}>
+                <p style={{color:"var(--sub)",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,marginBottom:8}}>The Secret Song Was</p>
+                <div className="display" style={{fontSize:30,color:"var(--text)",marginBottom:4}}>🎵 {song?.title}</div>
+                <p style={{color:"var(--gold)",marginBottom:14}}>{song?.artist} · {song?.year}</p>
+                <PlayBtn title={song?.title} artist={song?.artist} music={music} label="Play the Song! 🎵" color="var(--gold)"/>
+              </div>
+              {isHost && (
+                <button className="btn btn-gold" onClick={()=>{
+                  withFbError(()=>{
+                    // Calculate scores
+                    const s = {...(room.scores||{})}, topV = getTopVoted();
+                    players.forEach(p => {
+                      if (room.roles[p]==="investigator") {
+                        const caught = topV.filter(t=>imposters.includes(t)).length;
+                        s[p] = (s[p]||0) + caught*10 + (caught===imposters.length?20:0);
+                      }
+                    });
+                    imposters.forEach(imp => {
+                      if (!topV.includes(imp)) s[imp] = (s[imp]||0)+15;
+                      if (room.guesses?.[imp]?.id === song?.id) s[imp] = (s[imp]||0)+25;
+                    });
+                    return db.patch(`/rooms/${roomCode}`,{phase:"solo",soloIdx:0,scores:s});
+                  });
+                  music.stop(); SFX.fanfare();
+                }}>
+                  🎤 Time for THE SOLO!
+                </button>
+              )}
+              {!isHost && <p style={{textAlign:"center",color:"var(--sub)",fontSize:14,fontWeight:600}}>⏳ Waiting for host...</p>}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── SOLO ──────────────────────────────────────────────────────────────
+  if (phase === "solo") {
+    const impIdx = room.soloIdx || 0;
+    const imp = imposters[impIdx];
+    const guess = room.guesses?.[imp];
+    const correct = guess?.id === song?.id;
+    const isMySolo = imp === myName;
+    const soloTitle = correct ? guess?.title : song?.title;
+    const soloArtist = correct ? guess?.artist : song?.artist;
+
+    // Agent upgrade: audience reactions
+    async function sendReaction(r) {
+      SFX.reaction();
+      if (navigator.vibrate) navigator.vibrate(50);
+      const newR = {...(room.reactions||{}), [`${myName}_${Date.now()}`]: r};
+      await withFbError(() => db.patch(`/rooms/${roomCode}`, {reactions: newR}));
+    }
+    const reactionCounts = Object.values(room.reactions||{}).reduce((a,v)=>{a[v]=(a[v]||0)+1;return a},{});
+
+    async function nextSolo() {
+      music.stop();
+      if (impIdx < imposters.length-1) {
+        await withFbError(() => db.patch(`/rooms/${roomCode}`,{soloIdx:impIdx+1,reactions:{}}));
+      } else {
+        await withFbError(() => db.patch(`/rooms/${roomCode}`,{phase:"scores"}));
+        setConfetti(true); setTimeout(()=>setConfetti(false),6000);
+      }
+    }
+
+    return (
+      <div className="atm-solo" style={{minHeight:"100dvh",display:"flex",alignItems:"center",justifyContent:"center",padding:24,position:"relative",overflow:"hidden"}}>
+        <Confetti active={correct&&isMySolo}/>
+        {music.ytSong && <YouTubeModal title={music.ytSong.title} artist={music.ytSong.artist} onClose={music.stop}/>}
+        {/* Spotlight effect */}
+        <div style={{position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:400,height:"60%",background:"radial-gradient(ellipse at 50% 0%, rgba(244,197,66,0.18) 0%, transparent 70%)",pointerEvents:"none",animation:"spotlight 2s ease-in-out infinite"}}/>
+
+        <div className="container" style={{textAlign:"center",position:"relative"}}>
+          <div className="fade-up">
+            <div style={{fontSize:70,marginBottom:8}}>{correct?"🎯":"😅"}</div>
+            <div className="display" style={{fontSize:54,color:"var(--gold)",marginBottom:4}}>SOLO TIME!</div>
+            <div style={{fontSize:11,color:"var(--sub)",fontWeight:700,textTransform:"uppercase",letterSpacing:2,marginBottom:12}}>
+              Imposter {impIdx+1} of {imposters.length}
+            </div>
+            <div className="spotlight-wrap">
+              <div style={{display:"flex",justifyContent:"center",marginBottom:10}}>
+                <Avatar name={imp} players={players} size={72}/>
+              </div>
+              <div className="display" style={{fontSize:52,color:isMySolo?"var(--coral)":"var(--text)",marginBottom:4}}>
+                {imp}
+              </div>
+              {isMySolo && <div style={{color:"var(--coral)",fontWeight:800,fontSize:15,marginBottom:8}}>👆 THAT'S YOU!</div>}
+            </div>
+
+            {/* Guess result */}
+            <div className="card" style={{marginBottom:12,borderColor:correct?"rgba(0,201,167,0.4)":"rgba(239,68,68,0.3)",background:correct?"rgba(0,201,167,0.06)":"rgba(239,68,68,0.06)"}}>
+              {correct
+                ? <><div className="display" style={{fontSize:22,color:"var(--teal)",marginBottom:4}}>CORRECT GUESS! +25 pts</div>
+                    <div className="display" style={{fontSize:28,color:"var(--text)"}}>🎵 {guess?.title}</div></>
+                : <><div style={{color:"#f87171",fontWeight:700,marginBottom:4}}>Wrong guess (-0 pts)</div>
+                    <div style={{color:"var(--sub)",fontSize:13}}>Guessed: <strong style={{color:"var(--text)"}}>{guess?.title||"Nothing"}</strong></div>
+                    <div style={{color:"var(--sub)",fontSize:13}}>Real song: <strong style={{color:"var(--text)"}}>{song?.title}</strong></div></>}
+            </div>
+
+            {/* The solo card */}
+            <div className="card" style={{marginBottom:14,borderColor:"rgba(244,197,66,0.4)",background:"rgba(244,197,66,0.06)"}}>
+              <div style={{color:"var(--gold)",fontWeight:700,marginBottom:4}}>
+                {isMySolo?"You must sing:":"Stand up and sing:"}
+              </div>
+              <div className="display" style={{fontSize:28,color:"var(--gold)",marginBottom:8}}>"{soloTitle}"</div>
+              <p style={{color:"var(--sub)",fontSize:13,marginBottom:12}}>Stand up. Full commitment. No excuses. 🎤</p>
+              <PlayBtn title={soloTitle} artist={soloArtist} music={music} label="Play for reference" color="var(--gold)"/>
+            </div>
+
+            {/* Agent upgrade: audience reaction buttons */}
+            <div style={{display:"flex",gap:8,marginBottom:16}}>
+              {[["👏","Applause"],["💀","Dying"],["🎤","Belting"],["😭","Crying"]].map(([em,lb]) => (
+                <button key={em} className="reaction-btn" onClick={()=>sendReaction(em)}>
+                  {em}<span className="reaction-count">{reactionCounts[em]||0}</span>
+                </button>
+              ))}
+            </div>
+
+            {isHost && (
+              <button className="btn btn-gold" onClick={nextSolo}>
+                {impIdx < imposters.length-1 ? "Next Imposter 🎭" : "🏆 Final Scores!"}
+              </button>
+            )}
+            {!isHost && <p style={{color:"var(--sub)",fontSize:14,fontWeight:600}}>⏳ Host advances when solo is done</p>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── SCORES ────────────────────────────────────────────────────────────
+  if (phase === "scores") {
+    const sorted = Object.entries(room.scores||{}).sort((a,b)=>b[1]-a[1]);
+    const maxScore = sorted[0]?.[1] || 1;
+    const medals = ["🥇","🥈","🥉"];
+    return (
+      <div className="atm-scores" style={{minHeight:"100dvh",padding:"24px 20px 40px"}}>
+        <Confetti active={true}/>
+        {music.ytSong && <YouTubeModal title={music.ytSong.title} artist={music.ytSong.artist} onClose={music.stop}/>}
+        <div className="container">
+          <div className="fade-up" style={{textAlign:"center",marginBottom:24}}>
+            <div style={{fontSize:54,marginBottom:8}}>🏆</div>
+            <div className="display" style={{fontSize:60,color:"var(--gold)"}}>FINAL SCORES</div>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
+            {sorted.map(([name,score],i) => (
+              <div key={name} className="card" style={{
+                borderColor:i===0?"rgba(244,197,66,0.4)":name===myName?"rgba(255,95,63,0.3)":"var(--border)",
+                background:i===0?"rgba(244,197,66,0.06)":"var(--s2)",
+                animation:`fadeUp 0.4s ${i*0.07}s both`,
+                boxShadow:i===0?"0 0 30px rgba(244,197,66,0.1)":"none",
+              }}>
+                <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:10}}>
+                  <span style={{fontSize:24,width:28}}>{medals[i]||"🎖️"}</span>
+                  <Avatar name={name} players={players} size={44}/>
+                  <div style={{flex:1}}>
+                    <div style={{fontWeight:800,fontSize:16,color:name===myName?"var(--coral)":"var(--text)"}}>{name}{name===myName?" (you)":""}</div>
+                    <div style={{color:"var(--sub)",fontSize:11,fontWeight:700}}>{room.roles?.[name]==="imposter"?"🎭 Imposter":"🕵️ Investigator"}</div>
+                  </div>
+                  <div className="display" style={{fontSize:36,color:i===0?"var(--gold)":"var(--text)"}}>{score}</div>
+                </div>
+                {/* Agent upgrade: animated score bar */}
+                <div className="score-bar-wrap">
+                  <div className="score-bar" style={{
+                    width:`${(score/maxScore)*100}%`,
+                    background: i===0 ? "linear-gradient(90deg,var(--gold),#fbbf24)"
+                      : room.roles?.[name]==="imposter" ? "linear-gradient(90deg,var(--purple),#c084fc)"
+                      : "linear-gradient(90deg,var(--coral),#ff8a6e)",
+                  }}/>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="card" style={{marginBottom:14,fontSize:13,color:"var(--sub)",lineHeight:1.8}}>
+            <div style={{color:"var(--sub)",fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,marginBottom:6}}>Scoring</div>
+            <div>🕵️ +10 per imposter caught · +20 if all caught</div>
+            <div>🎭 +15 surviving the vote · +25 correct song guess</div>
+          </div>
+          {isHost && <button className="btn btn-primary" onClick={()=>{
+            withFbError(()=>db.patch(`/rooms/${roomCode}`,{phase:"waiting",song:null,roles:{},hints:[],votes:{},guesses:{},revealed:{},ready:{},hintLog:{},reactions:{},scores:{}}));
+            setHasVoted(false); setHasGuessed(false); setHasReadyRole(false); music.stop(); setScreen("lobby");
+          }}>🎮 Play Again!</button>}
+          {!isHost && <p style={{textAlign:"center",color:"var(--sub)",fontSize:14,fontWeight:600}}>⏳ Host can start a new round</p>}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{minHeight:"100dvh",display:"flex",alignItems:"center",justifyContent:"center",background:"var(--bg)"}}>
+      <div style={{fontSize:40,animation:"spin 1s linear infinite"}}>⏳</div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App/>);
+</script>
+</body>
+</html>
