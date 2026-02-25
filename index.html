@@ -299,6 +299,10 @@ const db = {
     async patch(path, data) {
         await fbFetch(path, { method: "PATCH", body: JSON.stringify(data), headers: { "Content-Type": "application/json" } });
     },
+    // setDeep: PUT at a specific leaf path - safe for concurrent per-player writes
+    async setDeep(path, value) {
+        await fbFetch(path, { method: "PUT", body: JSON.stringify(value), headers: { "Content-Type": "application/json" } });
+    },
 };
 function deepMerge(base, patch) {
     const out = Object.assign({}, base);
@@ -1246,7 +1250,7 @@ function App() {
                         React.createElement("p", { style: { color: "rgba(255,255,255,0.6)", marginBottom: 6, fontSize: 14 } }, "You do NOT know the song."),
                         React.createElement("p", { style: { color: "rgba(255,255,255,0.5)", fontSize: 13 } }, "Watch every hint. Blend in. Survive the vote."),
                         React.createElement("p", { style: { color: "#f87171", fontWeight: 700, marginTop: 12, fontSize: 13 } }, "\u26A0\uFE0F Don't get caught!"))),
-                React.createElement("button", { className: "btn btn-primary", onClick: () => { SFX.correct(); setHasReadyRole(true); withFbError(() => db.patch(`/rooms/${roomCode}`, { ready: { [myName]: true } })); } }, "Got it! \uD83D\uDC4D"))))) : (React.createElement("div", { className: "fade-up" },
+                React.createElement("button", { className: "btn btn-primary", onClick: () => { SFX.correct(); setHasReadyRole(true); withFbError(() => db.setDeep(`/rooms/${roomCode}/ready/${myName}`, true)); } }, "Got it! \uD83D\uDC4D"))))) : (React.createElement("div", { className: "fade-up" },
                 React.createElement("div", { style: { fontSize: 54, marginBottom: 12 } }, "\u2705"),
                 React.createElement("div", { className: "display", style: { fontSize: 40, color: "var(--teal)", marginBottom: 8 } }, "READY!"),
                 React.createElement("p", { style: { color: "var(--sub)", fontSize: 14, marginBottom: 20 } }, "Waiting for everyone..."),
@@ -1297,7 +1301,7 @@ function App() {
         const iAmImposter = ((_f = room.roles) === null || _f === void 0 ? void 0 : _f[myName]) === "imposter";
         async function nextHint() {
             if (myHintText.trim() && isMyTurn) {
-                await withFbError(() => db.patch(`/rooms/${roomCode}`, { hintLog: { [room.round || 0]: { [curPlayer]: myHintText.trim() } } }));
+                await withFbError(() => db.setDeep(`/rooms/${roomCode}/hintLog/${room.round || 0}/${curPlayer}`, myHintText.trim()));
                 setMyHintText("");
             }
             SFX.whoosh();
@@ -1418,7 +1422,7 @@ function App() {
                 return;
             SFX.whoosh();
             const newVotes = Object.assign(Object.assign({}, (room.votes || {})), { [myName]: myVote });
-            await withFbError(() => db.patch(`/rooms/${roomCode}`, { votes: { [myName]: myVote } }));
+            await withFbError(() => db.setDeep(`/rooms/${roomCode}/votes/${myName}`, myVote));
             setHasVoted(true);
             if (Object.keys(newVotes).length >= players.length) {
                 await withFbError(() => db.patch(`/rooms/${roomCode}`, { phase: "imposter_guess", guesses: {} }));
@@ -1478,7 +1482,7 @@ function App() {
                 return;
             SFX.whoosh();
             const newGuesses = Object.assign(Object.assign({}, (room.guesses || {})), { [myName]: myGuess });
-            await withFbError(() => db.patch(`/rooms/${roomCode}`, { guesses: { [myName]: myGuess } }));
+            await withFbError(() => db.setDeep(`/rooms/${roomCode}/guesses/${myName}`, myGuess));
             setHasGuessed(true);
             if (Object.keys(newGuesses).length >= imposters.length) {
                 await withFbError(() => db.patch(`/rooms/${roomCode}`, { phase: "reveal", revealed: {} }));
@@ -1550,7 +1554,7 @@ function App() {
                                     SFX.drumHit(1.5);
                                     setTimeout(() => {
                                         SFX.reveal();
-                                        withFbError(() => db.patch(`/rooms/${roomCode}`, { revealed: { [p]: true } }));
+                                        withFbError(() => db.setDeep(`/rooms/${roomCode}/revealed/${p}`, true));
                                         if (room.roles[p] === "imposter") {
                                             setTimeout(() => { setConfetti(true); setTimeout(() => setConfetti(false), 4000); }, 300);
                                             SFX.victory();
@@ -1615,7 +1619,7 @@ function App() {
             if (navigator.vibrate)
                 navigator.vibrate(50);
             const newR = Object.assign(Object.assign({}, (room.reactions || {})), { [`${myName}_${Date.now()}`]: r });
-            await withFbError(() => db.patch(`/rooms/${roomCode}`, { reactions: newR }));
+            await withFbError(() => db.patch(`/rooms/${roomCode}/reactions`, newR));
         }
         const reactionCounts = Object.values(room.reactions || {}).reduce((a, v) => { a[v] = (a[v] || 0) + 1; return a; }, {});
         async function nextSolo() {
