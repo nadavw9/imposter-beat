@@ -1072,8 +1072,8 @@ function App() {
         setLoading(false);
     }
     async function startGame() {
-        if (players.length < 3) {
-            setError("Need at least 3 players");
+        if (players.length < 2) {
+            setError("Need at least 2 players");
             return;
         }
         const s = rand(SONGS), sh = shuffle(players), roles = {};
@@ -1170,7 +1170,7 @@ function App() {
                         React.createElement("div", { style: { color: "var(--sub)", fontSize: 13, lineHeight: 1.55 } }, d))))),
                 React.createElement("button", { className: "btn btn-primary", style: { marginTop: 10 }, onClick: () => setScreen("home") }, "Let's Play! \uD83C\uDFAE"))));
     // ── LOBBY ─────────────────────────────────────────────────────────────
-    if (screen === "lobby" && room) {
+    if (screen === "lobby" && room && room.phase === "waiting") {
         const shareUrl = window.location.origin + window.location.pathname + `#join/${roomCode}`;
         return (React.createElement("div", { className: "atm-default page-top" },
             React.createElement("div", { className: "container fade-up" },
@@ -1189,7 +1189,7 @@ function App() {
                         players.length,
                         ")"),
                     React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "flex-start" } }, players.map(p => React.createElement(Avatar, { key: p, name: p, players: players, size: 52, showName: true, isHost: p === room.host }))),
-                    players.length < 3 && React.createElement("div", { style: { color: "#fbbf24", fontSize: 13, fontWeight: 600, marginTop: 12 } }, "\u26A0\uFE0F Need at least 3 players to start")),
+                    players.length < 2 && React.createElement("div", { style: { color: "#fbbf24", fontSize: 13, fontWeight: 600, marginTop: 12 } }, "\u26A0\uFE0F Need at least 2 players to start")),
                 isHost && (React.createElement("div", { className: "card", style: { marginBottom: 14 } },
                     React.createElement("div", { style: { color: "var(--sub)", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12 } }, "Imposters"),
                     React.createElement("div", { style: { display: "flex", gap: 8 } }, [1, 2, 3].map(n => (React.createElement("button", { key: n, onClick: () => withFbError(() => db.patch(`/rooms/${roomCode}`, { impostersCount: n })), style: { flex: 1, padding: "14px 0", borderRadius: 14, fontWeight: 900, fontSize: 24, border: "2px solid", cursor: "pointer",
@@ -1201,7 +1201,7 @@ function App() {
                     error && React.createElement("p", { style: { color: "#f87171", fontSize: 13, marginTop: 10 } },
                         "\u274C ",
                         error),
-                    React.createElement("button", { className: "btn btn-primary", style: { marginTop: 14 }, onClick: startGame, disabled: players.length < 3 }, "\uD83D\uDE80 Start Game!"))),
+                    React.createElement("button", { className: "btn btn-primary", style: { marginTop: 14 }, onClick: startGame, disabled: players.length < 2 }, "\uD83D\uDE80 Start Game!"))),
                 !isHost && React.createElement("div", { style: { textAlign: "center", color: "var(--sub)", padding: "20px 0", fontSize: 15, fontWeight: 600 } }, "\u23F3 Waiting for host to start..."))));
     }
     if (!(room === null || room === void 0 ? void 0 : room.phase))
@@ -1733,288 +1733,215 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(React.createElement(App, null));
 
 </script>
-<script>
+<script>// ═══════════════════════════════════════════════
+// IMPOSTER BEAT — IN-APP AI DEBUGGER v2.2
 // ═══════════════════════════════════════════════
-// IMPOSTER BEAT — IN-APP AI DEBUGGER
-// Catches all errors, diagnoses with Claude API,
-// generates fixed file for re-deploy
-// ═══════════════════════════════════════════════
-
 (function() {
-  const DB_VERSION = "2.1";
+  const VERSION = "2.2";
   let errorLog = [];
   let panelOpen = false;
   let diagnosing = false;
+  let apiKey = localStorage.getItem("ib_api_key") || "";
 
-  // ── Catch global errors ──────────────────────
   window.onerror = function(msg, src, line, col, err) {
-    addError({ type: "JS Error", message: msg, location: src + ":" + line + ":" + col, stack: err && err.stack });
+    addError({ type:"JS Error", message:msg, location:src+":"+line, stack:err&&err.stack });
     return false;
   };
   window.onunhandledrejection = function(e) {
-    const msg = e.reason && e.reason.message ? e.reason.message : String(e.reason);
-    addError({ type: "Unhandled Promise", message: msg, stack: e.reason && e.reason.stack });
+    const msg = e.reason&&e.reason.message ? e.reason.message : String(e.reason);
+    addError({ type:"Promise Error", message:msg, stack:e.reason&&e.reason.stack });
   };
   window.addEventListener("ib-error", function(e) {
-    addError({ type: "App Error", message: e.detail.message, label: e.detail.label, stack: e.detail.stack });
+    addError({ type:"App Error", message:e.detail.message, label:e.detail.label });
+    if (!panelOpen) { panelOpen = true; document.getElementById("ib-panel").classList.add("open"); }
   });
 
   function addError(err) {
     err.time = new Date().toLocaleTimeString();
     errorLog.push(err);
-    if (errorLog.length > 20) errorLog.shift();
-    updateBadge();
-    renderPanel();
+    if (errorLog.length > 30) errorLog.shift();
+    updateBadge(); renderPanel();
   }
 
-  // ── Build UI ─────────────────────────────────
-  const style = document.createElement("style");
-  style.textContent = `
-    #ib-debug-btn {
-      position: fixed; bottom: 20px; right: 20px; z-index: 9999;
-      width: 52px; height: 52px; border-radius: 50%; border: none;
-      background: #1a1a2e; color: #fff; font-size: 22px; cursor: pointer;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 0 2px rgba(255,95,63,0.3);
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s; font-family: sans-serif;
-    }
-    #ib-debug-btn:hover { transform: scale(1.1); }
-    #ib-debug-btn.has-errors { box-shadow: 0 4px 20px rgba(239,68,68,0.6), 0 0 0 2px #ef4444; animation: ib-pulse 2s ease-in-out infinite; }
-    @keyframes ib-pulse { 0%,100%{box-shadow:0 4px 20px rgba(239,68,68,0.4),0 0 0 2px #ef4444} 50%{box-shadow:0 4px 30px rgba(239,68,68,0.8),0 0 0 3px #f87171} }
-    #ib-badge {
-      position: absolute; top: -4px; right: -4px;
-      background: #ef4444; color: #fff; font-size: 10px; font-weight: 900;
-      border-radius: 50%; width: 18px; height: 18px;
-      display: none; align-items: center; justify-content: center;
-      font-family: monospace; border: 2px solid #07070f;
-    }
-    #ib-panel {
-      position: fixed; bottom: 82px; right: 12px; z-index: 9998;
-      width: calc(100vw - 24px); max-width: 420px;
-      background: #0d0d1e; border: 1px solid #2a2a50;
-      border-radius: 20px; overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-      display: none; flex-direction: column;
-      max-height: 70vh;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    #ib-panel.open { display: flex; animation: ib-slide 0.25s cubic-bezier(0.22,1,0.36,1); }
-    @keyframes ib-slide { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-    #ib-header {
-      padding: 14px 16px; background: #141428;
-      border-bottom: 1px solid #2a2a50;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    #ib-title { color: #FF5F3F; font-weight: 900; font-size: 14px; }
-    #ib-version { color: #5555a0; font-size: 10px; font-family: monospace; }
-    #ib-close { background: none; border: none; color: #5555a0; font-size: 20px; cursor: pointer; padding: 0 4px; }
-    #ib-body { overflow-y: auto; flex: 1; padding: 12px; }
-    .ib-empty { color: #5555a0; font-size: 13px; text-align: center; padding: 24px; }
-    .ib-error-card {
-      background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
-      border-radius: 12px; padding: 12px; margin-bottom: 10px;
-    }
-    .ib-error-type { color: #f87171; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-    .ib-error-msg { color: #fecaca; font-size: 13px; font-weight: 600; margin-bottom: 4px; word-break: break-word; }
-    .ib-error-time { color: #5555a0; font-size: 10px; font-family: monospace; }
-    #ib-footer { padding: 12px; border-top: 1px solid #2a2a50; display: flex; flex-direction: column; gap: 8px; }
-    .ib-btn {
-      width: 100%; padding: 12px; border: none; border-radius: 12px;
-      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 800;
-      cursor: pointer; transition: all 0.15s;
-    }
-    .ib-btn:active { transform: scale(0.97); }
-    .ib-btn-ai { background: #7c3aed; color: #fff; }
-    .ib-btn-ai:hover { background: #6d28d9; }
-    .ib-btn-ai:disabled { background: #2a2a45; color: #5555a0; cursor: not-allowed; }
-    .ib-btn-clear { background: rgba(255,255,255,0.05); color: #9090c0; }
-    #ib-diagnosis {
-      background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.3);
-      border-radius: 12px; padding: 12px; margin-bottom: 10px;
-    }
-    #ib-diagnosis .ib-d-label { color: #a78bfa; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-    #ib-diagnosis .ib-d-text { color: #c4b5fd; font-size: 13px; line-height: 1.6; }
-    #ib-diagnosis .ib-d-fix { color: #4ade80; font-size: 13px; font-weight: 700; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(124,58,237,0.2); line-height: 1.6; }
-    .ib-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: ib-spin 0.8s linear infinite; vertical-align: middle; margin-right: 6px; }
-    @keyframes ib-spin { to { transform: rotate(360deg); } }
-    #ib-download-btn {
-      width: 100%; padding: 12px; border: none; border-radius: 12px;
-      background: #059669; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 14px; font-weight: 800; cursor: pointer; display: none; margin-top: 4px;
-    }
-    #ib-download-btn:hover { background: #047857; }
+  const css = `
+    #ib-fab { position:fixed; bottom:16px; right:16px; z-index:9999; width:48px; height:48px; border-radius:50%; border:none; background:#1a1228; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 4px 16px rgba(0,0,0,0.6), 0 0 0 1.5px rgba(255,95,63,0.2); transition:transform .2s; }
+    #ib-fab:hover { transform:scale(1.1); }
+    #ib-fab.has-errors { animation:ib-glow 1.8s ease-in-out infinite; }
+    @keyframes ib-glow { 0%,100%{box-shadow:0 4px 16px rgba(239,68,68,0.4),0 0 0 1.5px #ef4444} 50%{box-shadow:0 4px 28px rgba(239,68,68,0.8),0 0 0 2px #f87171} }
+    #ib-badge { position:absolute; top:-3px; right:-3px; background:#ef4444; color:#fff; font-size:9px; font-weight:900; border-radius:50%; width:16px; height:16px; display:none; align-items:center; justify-content:center; border:1.5px solid #07070f; font-family:monospace; }
+    #ib-panel { position:fixed; bottom:72px; right:12px; z-index:9998; width:min(calc(100vw - 24px),400px); background:#0d0d1e; border:1px solid #2a2a50; border-radius:18px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.8); display:none; flex-direction:column; max-height:72vh; font-family:'Plus Jakarta Sans',system-ui,sans-serif; }
+    #ib-panel.open { display:flex; animation:ib-up .22s cubic-bezier(.22,1,.36,1); }
+    @keyframes ib-up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    #ib-head { padding:12px 14px; background:#141428; border-bottom:1px solid #2a2a50; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    #ib-head-title { color:#FF5F3F; font-weight:900; font-size:13px; }
+    #ib-head-sub { color:#444470; font-size:10px; font-family:monospace; }
+    #ib-close-btn { background:none; border:none; color:#444470; font-size:18px; cursor:pointer; line-height:1; padding:0 2px; }
+    #ib-body { overflow-y:auto; flex:1; padding:10px; }
+    #ib-footer { padding:10px; border-top:1px solid #2a2a50; flex-shrink:0; display:flex; flex-direction:column; gap:7px; }
+    .ib-empty { color:#444470; font-size:12px; text-align:center; padding:20px 10px; line-height:1.6; }
+    .ib-err { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:10px; padding:10px 12px; margin-bottom:8px; }
+    .ib-err-type { color:#f87171; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; margin-bottom:3px; }
+    .ib-err-msg { color:#fecaca; font-size:12px; font-weight:600; word-break:break-word; margin-bottom:3px; }
+    .ib-err-time { color:#333355; font-size:9px; font-family:monospace; }
+    .ib-key-row { display:flex; gap:6px; }
+    .ib-key-input { flex:1; padding:9px 10px; background:rgba(255,255,255,0.05); border:1px solid #2a2a50; border-radius:9px; color:#c0c0e0; font-size:12px; outline:none; font-family:monospace; }
+    .ib-key-input:focus { border-color:#7c3aed; }
+    .ib-key-save { padding:9px 12px; background:#7c3aed; color:#fff; border:none; border-radius:9px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; }
+    .ib-btn { width:100%; padding:11px; border:none; border-radius:10px; font-size:13px; font-weight:800; cursor:pointer; transition:all .15s; font-family:inherit; }
+    .ib-btn:active { transform:scale(.97); }
+    .ib-btn-ai { background:#7c3aed; color:#fff; }
+    .ib-btn-ai:disabled { background:#222240; color:#444470; cursor:not-allowed; }
+    .ib-btn-clr { background:rgba(255,255,255,0.04); color:#6060a0; }
+    #ib-diag { background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.25); border-radius:10px; padding:10px 12px; }
+    .ib-diag-lbl { color:#a78bfa; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; margin-bottom:5px; }
+    .ib-diag-txt { color:#c4b5fd; font-size:12px; line-height:1.6; }
+    .ib-diag-fix { color:#4ade80; font-size:12px; line-height:1.6; margin-top:7px; padding-top:7px; border-top:1px solid rgba(124,58,237,0.2); }
+    .ib-diag-now { color:#fbbf24; font-size:12px; line-height:1.6; margin-top:5px; }
+    .ib-spin { display:inline-block; width:12px; height:12px; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:ib-spin .7s linear infinite; vertical-align:middle; margin-right:5px; }
+    @keyframes ib-spin { to{transform:rotate(360deg)} }
+    #ib-key-hint { color:#444470; font-size:10px; text-align:center; line-height:1.5; }
+    #ib-key-hint a { color:#7c3aed; text-decoration:none; }
   `;
-  document.head.appendChild(style);
+  const styleEl = document.createElement("style");
+  styleEl.textContent = css;
+  document.head.appendChild(styleEl);
 
-  // Bug button
-  const btn = document.createElement("button");
-  btn.id = "ib-debug-btn";
-  btn.title = "AI Debugger";
-  btn.innerHTML = '<span>🐛</span><div id="ib-badge"></div>';
-  btn.onclick = togglePanel;
-  document.body.appendChild(btn);
+  // FAB button
+  const fab = document.createElement("button");
+  fab.id = "ib-fab";
+  fab.title = "AI Debugger";
+  fab.innerHTML = "🐛<div id='ib-badge'></div>";
+  fab.onclick = () => { panelOpen = !panelOpen; document.getElementById("ib-panel").classList.toggle("open", panelOpen); };
+  document.body.appendChild(fab);
 
   // Panel
   const panel = document.createElement("div");
   panel.id = "ib-panel";
   panel.innerHTML = `
-    <div id="ib-header">
-      <div>
-        <div id="ib-title">🤖 AI Debugger</div>
-        <div id="ib-version">v${DB_VERSION} · Powered by Claude</div>
-      </div>
-      <button id="ib-close">✕</button>
+    <div id="ib-head">
+      <div><div id="ib-head-title">🤖 AI Debugger</div><div id="ib-head-sub">v${VERSION} · Claude-powered</div></div>
+      <button id="ib-close-btn">✕</button>
     </div>
-    <div id="ib-body">
-      <div class="ib-empty">No errors caught yet.<br>Play the game — issues will appear here.</div>
-    </div>
+    <div id="ib-body"><div class="ib-empty">No errors yet.<br>Errors auto-appear here when something breaks.</div></div>
     <div id="ib-footer">
-      <div id="ib-diagnosis" style="display:none"></div>
-      <button class="ib-btn ib-btn-ai" id="ib-fix-btn" onclick="window._ibDiagnose()">⚖️ Diagnose with Claude AI</button>
-      <button id="ib-download-btn" onclick="window._ibDownload()">⬇️ Download Fixed Version</button>
-      <button class="ib-btn ib-btn-clear" onclick="window._ibClear()">🗑 Clear Log</button>
+      <div id="ib-diag" style="display:none"></div>
+      <div id="ib-key-hint">Need an API key? Get one free at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
+      <div class="ib-key-row">
+        <input class="ib-key-input" id="ib-key-input" type="password" placeholder="sk-ant-... (Anthropic API key)" value="${apiKey}"/>
+        <button class="ib-key-save" id="ib-key-save">Save</button>
+      </div>
+      <button class="ib-btn ib-btn-ai" id="ib-diag-btn">⚖️ Diagnose with Claude</button>
+      <button class="ib-btn ib-btn-clr" id="ib-clr-btn">🗑 Clear</button>
     </div>
   `;
   document.body.appendChild(panel);
-  panel.querySelector("#ib-close").onclick = togglePanel;
 
-  function togglePanel() {
-    panelOpen = !panelOpen;
-    panel.classList.toggle("open", panelOpen);
-  }
+  panel.querySelector("#ib-close-btn").onclick = () => { panelOpen = false; panel.classList.remove("open"); };
+  panel.querySelector("#ib-key-save").onclick = () => {
+    apiKey = panel.querySelector("#ib-key-input").value.trim();
+    localStorage.setItem("ib_api_key", apiKey);
+    const btn = panel.querySelector("#ib-key-save");
+    btn.textContent = "✓"; setTimeout(() => btn.textContent = "Save", 1500);
+  };
+  panel.querySelector("#ib-clr-btn").onclick = () => {
+    errorLog = [];
+    const d = document.getElementById("ib-diag");
+    if (d) d.style.display = "none";
+    updateBadge(); renderPanel();
+  };
+  panel.querySelector("#ib-diag-btn").onclick = diagnose;
 
   function updateBadge() {
     const badge = document.getElementById("ib-badge");
-    const btn = document.getElementById("ib-debug-btn");
-    if (!badge || !btn) return;
+    const f = document.getElementById("ib-fab");
+    if (!badge || !f) return;
     if (errorLog.length > 0) {
       badge.style.display = "flex";
-      badge.textContent = errorLog.length > 9 ? "9+" : errorLog.length;
-      btn.classList.add("has-errors");
+      badge.textContent = Math.min(errorLog.length, 9) + (errorLog.length > 9 ? "+" : "");
+      f.classList.add("has-errors");
     } else {
       badge.style.display = "none";
-      btn.classList.remove("has-errors");
+      f.classList.remove("has-errors");
     }
   }
 
   function renderPanel() {
     const body = document.getElementById("ib-body");
     if (!body) return;
-    if (errorLog.length === 0) {
-      body.innerHTML = '<div class="ib-empty">No errors caught yet.<br>Play the game — issues will appear here.</div>';
-      return;
-    }
-    body.innerHTML = errorLog.slice().reverse().map(e => `
-      <div class="ib-error-card">
-        <div class="ib-error-type">${e.type || "Error"}${e.label ? " · " + e.label : ""}</div>
-        <div class="ib-error-msg">${e.message || "Unknown"}</div>
-        <div class="ib-error-time">${e.time}</div>
-      </div>
-    `).join("");
+    if (!errorLog.length) { body.innerHTML = '<div class="ib-empty">No errors yet.<br>Errors auto-appear here when something breaks.</div>'; return; }
+    body.innerHTML = errorLog.slice().reverse().map(e =>
+      `<div class="ib-err"><div class="ib-err-type">${e.type||"Error"}${e.label?" · "+e.label:""}</div><div class="ib-err-msg">${e.message||"Unknown"}</div><div class="ib-err-time">${e.time}</div></div>`
+    ).join("");
   }
 
-  window._ibClear = function() {
-    errorLog = [];
-    const d = document.getElementById("ib-diagnosis");
-    const dl = document.getElementById("ib-download-btn");
-    if (d) d.style.display = "none";
-    if (dl) dl.style.display = "none";
-    updateBadge();
-    renderPanel();
-  };
-
-  let lastFixedCode = null;
-
-  window._ibDiagnose = async function() {
+  async function diagnose() {
     if (diagnosing) return;
-    diagnosing = true;
-    const fixBtn = document.getElementById("ib-fix-btn");
-    const diagDiv = document.getElementById("ib-diagnosis");
-    if (fixBtn) { fixBtn.disabled = true; fixBtn.innerHTML = '<span class="ib-spinner"></span>Claude is diagnosing...'; }
-    if (diagDiv) { diagDiv.style.display = "block"; diagDiv.innerHTML = '<div class="ib-d-label">Analyzing...</div><div class="ib-d-text">Claude is reading the errors and the full game code...</div>'; }
-
-    const errSummary = errorLog.map(e => `[${e.type}] ${e.message}${e.label ? " ("+e.label+")" : ""}${e.stack ? "\nStack: " + e.stack.split("\n").slice(0,3).join(" | ") : ""}`).join("\n\n");
+    const key = (document.getElementById("ib-key-input") && document.getElementById("ib-key-input").value.trim()) || apiKey;
+    const diagDiv = document.getElementById("ib-diag");
+    const diagBtn = document.getElementById("ib-diag-btn");
     
-    // Get current page source
-    const pageSource = document.documentElement.outerHTML;
-    const truncated = pageSource.length > 15000 ? pageSource.slice(0, 7000) + "\n...TRUNCATED...\n" + pageSource.slice(-7000) : pageSource;
+    if (!key || !key.startsWith("sk-")) {
+      if (diagDiv) { diagDiv.style.display = "block"; diagDiv.innerHTML = '<div class="ib-diag-lbl">API Key Required</div><div class="ib-diag-txt">Enter your Anthropic API key above. Get one free at <a href="https://console.anthropic.com" target="_blank" style="color:#a78bfa">console.anthropic.com</a> — takes 2 minutes.</div>'; }
+      return;
+    }
+    if (!errorLog.length) {
+      if (diagDiv) { diagDiv.style.display = "block"; diagDiv.innerHTML = '<div class="ib-diag-lbl">No Errors</div><div class="ib-diag-txt">No errors logged yet. Reproduce the issue first, then diagnose.</div>'; }
+      return;
+    }
 
-    const prompt = `You are debugging "Imposter Beat", a multiplayer music party game built as a single self-contained HTML file using React 18 (UMD CDN), Firebase Realtime Database REST API, and pre-compiled React.createElement calls (no JSX, no Babel).
+    diagnosing = true;
+    if (diagBtn) { diagBtn.disabled = true; diagBtn.innerHTML = '<span class="ib-spin"></span>Diagnosing...'; }
+    if (diagDiv) { diagDiv.style.display = "block"; diagDiv.innerHTML = '<div class="ib-diag-lbl">Analyzing...</div><div class="ib-diag-txt">Claude is reading the error log...</div>'; }
 
-ERRORS CAUGHT:
-${errSummary}
+    const errText = errorLog.map(e => `[${e.type}] ${e.message}${e.label?" ("+e.label+")":""}`).join("\n");
+    const prompt = `Debugging "Imposter Beat" — a multiplayer music party game. Single HTML file, React 18 UMD, Firebase Realtime Database REST API.
 
-The most common issues in this app:
-- Firebase network/timeout: user's internet or Firebase rules
-- withFbError silently eating errors 
-- State not resetting between game phases
-- React rendering errors from undefined room/player data
+Errors caught:
+${errText}
 
-PAGE SOURCE (first portion):
-${truncated.slice(0, 8000)}
+Common causes in this app:
+- Firebase: rules not set to public (need true/true in console.firebase.google.com)
+- Firebase: network error or timeout
+- Start Game button disabled: needs 2+ players in room
+- withFbError swallowing async errors silently
 
-Please provide:
-1. DIAGNOSIS: What is causing this error? (2-3 sentences, plain language)
-2. FIX: Exactly what needs to change in the code? Be specific about which function and what to change.
-3. WORKAROUND: Is there anything the user can try right now without code changes?
+Give: 1) Plain-English diagnosis (1-2 sentences) 2) Exact fix 3) What to try right now
 
-Format your response as JSON: {"diagnosis": "...", "fix": "...", "workaround": "..."}`;
+JSON only: {"diagnosis":"...","fix":"...","workaround":"..."}`;
 
     try {
       const resp = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 600,
-          messages: [{ role: "user", content: prompt }],
-          system: "You are a senior JavaScript debugger. Always respond with valid JSON only. Be concise and actionable.",
-        }),
+        headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+        body: JSON.stringify({ model:"claude-haiku-4-5-20251001", max_tokens:400, messages:[{role:"user",content:prompt}], system:"Senior JS debugger. JSON only, no markdown." }),
       });
+      if (!resp.ok) { throw new Error("API returned " + resp.status + " — check your API key"); }
       const data = await resp.json();
       const text = data.content?.[0]?.text || "{}";
       let parsed;
-      try { parsed = JSON.parse(text.replace(/```json|```/g, "").trim()); }
-      catch { parsed = { diagnosis: text, fix: "", workaround: "" }; }
-
-      if (diagDiv) {
-        diagDiv.innerHTML = `
-          <div class="ib-d-label">🔍 Diagnosis</div>
-          <div class="ib-d-text">${parsed.diagnosis || "No diagnosis available"}</div>
-          ${parsed.fix ? '<div class="ib-d-fix">🔧 Fix: ' + parsed.fix + '</div>' : ""}
-          ${parsed.workaround ? '<div class="ib-d-fix" style="color:#fbbf24">⚡ Right now: ' + parsed.workaround + '</div>' : ""}
-        `;
-      }
-      lastFixedCode = parsed.patchedCode || null;
-      const dl = document.getElementById("ib-download-btn");
-      if (dl && lastFixedCode) dl.style.display = "block";
-
+      try { parsed = JSON.parse(text.replace(/```json|```/g,"").trim()); } catch { parsed = {diagnosis:text,fix:"",workaround:""}; }
+      if (diagDiv) diagDiv.innerHTML = `
+        <div class="ib-diag-lbl">🔍 Diagnosis</div>
+        <div class="ib-diag-txt">${parsed.diagnosis||"No diagnosis"}</div>
+        ${parsed.fix?'<div class="ib-diag-fix">🔧 '+parsed.fix+'</div>':""}
+        ${parsed.workaround?'<div class="ib-diag-now">⚡ Right now: '+parsed.workaround+'</div>':""}
+      `;
     } catch(err) {
-      if (diagDiv) diagDiv.innerHTML = '<div class="ib-d-label">Error</div><div class="ib-d-text">Could not reach Claude API: ' + err.message + '</div>';
+      if (diagDiv) diagDiv.innerHTML = `<div class="ib-diag-lbl">Error</div><div class="ib-diag-txt" style="color:#f87171">${err.message}</div>`;
     }
     diagnosing = false;
-    if (fixBtn) { fixBtn.disabled = false; fixBtn.innerHTML = "⚖️ Diagnose Again"; }
-  };
+    if (diagBtn) { diagBtn.disabled = false; diagBtn.innerHTML = "⚖️ Diagnose Again"; }
+  }
 
-  window._ibDownload = function() {
-    if (!lastFixedCode) return;
-    const blob = new Blob([lastFixedCode], { type: "text/html" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "ImposterBeat-fixed.html";
-    a.click();
+  // Intercept console.error for React errors
+  const orig = console.error;
+  console.error = function(...a) {
+    orig.apply(console, a);
+    const msg = a.map(x => typeof x==="object"?(x&&x.message?x.message:JSON.stringify(x)):String(x)).join(" ");
+    if (msg.includes("Warning:") || msg.length < 5) return;
+    addError({ type:"Console Error", message:msg.slice(0,200) });
   };
-
-  // Also intercept console.error to catch React errors
-  const origError = console.error;
-  console.error = function(...args) {
-    origError.apply(console, args);
-    const msg = args.map(a => typeof a === "object" ? (a && a.message ? a.message : JSON.stringify(a)) : String(a)).join(" ");
-    if (msg.includes("Warning:") && !msg.includes("act(")) return; // skip React warnings
-    addError({ type: "Console Error", message: msg.slice(0, 200) });
-  };
-
 })();
 </script>
 </body>
-</html>
+  </html>
